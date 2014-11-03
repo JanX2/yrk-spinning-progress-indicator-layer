@@ -313,7 +313,7 @@
         newFin.bounds = finBounds;
         newFin.anchorPoint = finAnchorPoint;
         newFin.position = finPosition;
-        newFin.transform = CATransform3DMakeRotation(i*(-6.282185/_numFins), 0.0, 0.0, 1.0);
+        newFin.transform = CATransform3DMakeRotation(i*(-2*M_PI/_numFins), 0.0, 0.0, 1.0);
         newFin.cornerRadius = finCornerRadius;
         newFin.backgroundColor = _foreColor;
 
