@@ -146,10 +146,10 @@
 		764F1DB10E235DDC00054919 /* Demo App */ = {
 			isa = PBXGroup;
 			children = (
-				763459CB0F47D3B300C1B478 /* SPILDTopLayerView.m */,
 				763459CC0F47D3B300C1B478 /* SPILDTopLayerView.h */,
-				763459CD0F47D3B300C1B478 /* SPILDAppController.m */,
+				763459CB0F47D3B300C1B478 /* SPILDTopLayerView.m */,
 				763459CE0F47D3B300C1B478 /* SPILDAppController.h */,
+				763459CD0F47D3B300C1B478 /* SPILDAppController.m */,
 			);
 			name = "Demo App";
 			sourceTree = "<group>";
@@ -157,8 +157,8 @@
 		764F1DB20E235DE300054919 /* YRKSpinningProgressIndicatorLayer */ = {
 			isa = PBXGroup;
 			children = (
-				763459C80F47D3AB00C1B478 /* YRKSpinningProgressIndicatorLayer.m */,
 				763459C90F47D3AB00C1B478 /* YRKSpinningProgressIndicatorLayer.h */,
+				763459C80F47D3AB00C1B478 /* YRKSpinningProgressIndicatorLayer.m */,
 			);
 			name = YRKSpinningProgressIndicatorLayer;
 			sourceTree = "<group>";
