@@ -60,9 +60,8 @@
     _plainBackgroundLayer.bounds = [[self layer] bounds];
     _plainBackgroundLayer.autoresizingMask = (kCALayerWidthSizable|kCALayerHeightSizable);
     _plainBackgroundLayer.zPosition = 0;
-    CGColorRef cgColor = CGColorCreateFromNSColor([NSColor blueColor]);
+    CGColorRef cgColor = [[NSColor blueColor] CGColor];
     _plainBackgroundLayer.backgroundColor = cgColor;
-    CGColorRelease(cgColor);
     [_rootLayer addSublayer:_plainBackgroundLayer];
 
     // Start with QC background
@@ -139,9 +138,8 @@
 {
     [CATransaction begin];
     [CATransaction setValue:[NSNumber numberWithBool:YES] forKey:kCATransactionDisableActions];
-    CGColorRef cgColor = CGColorCreateFromNSColor(newColor);
+    CGColorRef cgColor = [newColor CGColor];
     _plainBackgroundLayer.backgroundColor = cgColor;
-    CGColorRelease(cgColor);
     [CATransaction commit];
 }
 

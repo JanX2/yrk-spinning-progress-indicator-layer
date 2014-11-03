@@ -38,7 +38,3 @@
 @property (readwrite, copy) NSColor *color;  // "copy" because we don't retain it -- we create a CGColor from it
 
 @end
-
-// Helper Functions
-CGColorRef CGColorCreateFromNSColor(NSColor *nscolor);
-NSColor *NSColorFromCGColorRef(CGColorRef cgcolor);

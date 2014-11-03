@@ -215,12 +215,12 @@
 - (NSColor *)color
 {
     // Need to convert from CGColor to NSColor
-    return  NSColorFromCGColorRef(_foreColor);
+    return [NSColor colorWithCGColor:_foreColor];
 }
 - (void)setColor:(NSColor *)newColor
 {
     // Need to convert from NSColor to CGColor
-    CGColorRef cgColor = CGColorCreateFromNSColor(newColor);
+    CGColorRef cgColor = CGColorRetain([newColor CGColor]);
 
     if (nil != _foreColor) {
         CGColorRelease(_foreColor);
@@ -366,41 +366,3 @@
 }
 
 @end
-
-
-//------------------------------------------------------------------------------
-#pragma mark -
-#pragma mark Helper Functions
-//------------------------------------------------------------------------------
-
-/// Note: This returns a CGColorRef that the caller needs to release.
-CGColorRef CGColorCreateFromNSColor(NSColor *nscolor)
-{
-// make this work with both 10.5 and 10.6 SDKs, based on a trick used
-// by Cairo, and recommened to me by Eloy Duran (via email)
-// http://lists.cairographics.org/archives/cairo-bugs/2009-December/003385.html
-#ifdef CGFLOAT_DEFINED
-#define yrkspil_float_t CGFloat
-#else
-#define yrkspil_float_t float
-#endif
-    yrkspil_float_t components[4];
-    NSColor *deviceColor = [nscolor colorUsingColorSpaceName: NSDeviceRGBColorSpace];
-    [deviceColor getRed: &components[0] green: &components[1] blue: &components[2] alpha: &components[3]];
-
-    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-    CGColorRef cgcolor = CGColorCreate(colorSpace, components);
-    CGColorSpaceRelease(colorSpace);
-
-    return cgcolor;
-#undef yrkspil_float_t
-}
-
-
-NSColor *NSColorFromCGColorRef(CGColorRef cgcolor)
-{
-    NSColorSpace *colorSpace = [NSColorSpace deviceRGBColorSpace];
-    return [NSColor colorWithColorSpace:colorSpace
-                             components:CGColorGetComponents(cgcolor)
-                                  count:CGColorGetNumberOfComponents(cgcolor)];
-}
