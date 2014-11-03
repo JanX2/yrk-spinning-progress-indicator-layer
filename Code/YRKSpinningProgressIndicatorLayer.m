@@ -21,8 +21,8 @@
 - (void)removeFinLayers;
 - (void)createFinLayers;
 
-- (CGRect)finBoundsForCurrentBounds;
-- (CGPoint)finAnchorPointForCurrentBounds;
+@property (nonatomic, readonly) CGRect finBoundsForCurrentBounds;
+@property (nonatomic, readonly) CGPoint finAnchorPointForCurrentBounds;
 
 - (void)setupAnimTimer;
 - (void)disposeAnimTimer;
@@ -37,7 +37,7 @@
 #pragma mark Init, Dealloc, etc
 //------------------------------------------------------------------------------
 
-- (id)init
+- (instancetype)init
 {
     self = [super init];
     if (self) {
@@ -80,7 +80,7 @@
 
     // do the resizing all at once, immediately
     [CATransaction begin];
-    [CATransaction setValue:[NSNumber numberWithBool:YES] forKey:kCATransactionDisableActions];
+    [CATransaction setValue:@YES forKey:kCATransactionDisableActions];
     for (CALayer *fin in _finLayers) {
         fin.bounds = finBounds;
         fin.anchorPoint = finAnchorPoint;
@@ -103,11 +103,11 @@
         _position = 0;
     }
 
-    CALayer *fin = (CALayer *)[_finLayers objectAtIndex:_position];
+    CALayer *fin = (CALayer *)_finLayers[_position];
 
     // Set the next fin to full opacity, but do it immediately, without any animation
     [CATransaction begin];
-    [CATransaction setValue:[NSNumber numberWithBool:YES] forKey:kCATransactionDisableActions];
+    [CATransaction setValue:@YES forKey:kCATransactionDisableActions];
     fin.opacity = 1.0;
     [CATransaction commit];
 
@@ -229,7 +229,7 @@
 
     // Update do all of the fins to this new color, at once, immediately
     [CATransaction begin];
-    [CATransaction setValue:[NSNumber numberWithBool:YES] forKey:kCATransactionDisableActions];
+    [CATransaction setValue:@YES forKey:kCATransactionDisableActions];
     for (CALayer *fin in _finLayers) {
         fin.backgroundColor = cgColor;
     }
@@ -322,16 +322,14 @@
 
         // Set the fin's initial opacity
         [CATransaction begin];
-        [CATransaction setValue:[NSNumber numberWithBool:YES] forKey:kCATransactionDisableActions];
+        [CATransaction setValue:@YES forKey:kCATransactionDisableActions];
         newFin.opacity = _fadeDownOpacity;
         [CATransaction commit];
 
         // set the fin's fade-out time (for when it's animating)
         CABasicAnimation *anim = [CABasicAnimation animation];
         anim.duration = 0.7f;
-        NSDictionary* actions = [NSDictionary dictionaryWithObjectsAndKeys:
-                                 anim, @"opacity",
-                                 nil];
+        NSDictionary* actions = @{@"opacity": anim};
         [newFin setActions:actions];
 
         [self addSublayer: newFin];

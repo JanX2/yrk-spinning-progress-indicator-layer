@@ -99,7 +99,7 @@
 {
     // Hide the QC background and show the plain one
     [CATransaction begin];
-    [CATransaction setValue:[NSNumber numberWithBool:YES] forKey:kCATransactionDisableActions];
+    [CATransaction setValue:@YES forKey:kCATransactionDisableActions];
     _qcBackgroundLayer.hidden = YES;
     _plainBackgroundLayer.hidden = NO;
     [CATransaction commit];
@@ -126,7 +126,7 @@
 
     // Hide the plain background and show the QC one
     [CATransaction begin];
-    [CATransaction setValue:[NSNumber numberWithBool:YES] forKey:kCATransactionDisableActions];
+    [CATransaction setValue:@YES forKey:kCATransactionDisableActions];
     _qcBackgroundLayer.hidden = NO;
     _plainBackgroundLayer.hidden = YES;
     [CATransaction commit];
@@ -137,7 +137,7 @@
 - (void)setPlainBackgroundColor:(NSColor *)newColor
 {
     [CATransaction begin];
-    [CATransaction setValue:[NSNumber numberWithBool:YES] forKey:kCATransactionDisableActions];
+    [CATransaction setValue:@YES forKey:kCATransactionDisableActions];
     CGColorRef cgColor = [newColor CGColor];
     _plainBackgroundLayer.backgroundColor = cgColor;
     [CATransaction commit];
