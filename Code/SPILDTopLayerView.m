@@ -31,13 +31,10 @@
 - (void)dealloc
 {
     [_rootLayer removeFromSuperlayer];
-    [_rootLayer release];
 
     [_progressIndicatorLayer removeFromSuperlayer];
     [_plainBackgroundLayer removeFromSuperlayer];
     [_qcBackgroundLayer removeFromSuperlayer];
-
-    [super dealloc];
 }
 
 - (void)awakeFromNib

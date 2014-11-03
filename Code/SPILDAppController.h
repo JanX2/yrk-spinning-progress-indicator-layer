@@ -13,7 +13,7 @@
 
 @interface SPILDAppController : NSObject {
     IBOutlet NSWindow *_window;
-    IBOutlet SPILDTopLayerView *_mainView;
+    IBOutlet SPILDTopLayerView *__weak _mainView;
 
     IBOutlet NSButton *_startStopButton;
     IBOutlet NSColorWell *_fgColorWell;
@@ -29,6 +29,6 @@
 - (IBAction)startStopProgressIndicator:(id)sender;
 
 // Properties
-@property (assign) IBOutlet SPILDTopLayerView *mainView;
+@property (weak) IBOutlet SPILDTopLayerView *mainView;
 
 @end

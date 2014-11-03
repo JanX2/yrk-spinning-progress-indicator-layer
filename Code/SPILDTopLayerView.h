@@ -15,7 +15,7 @@
 // the MenuView class is the view subclass that is inserted into
 // the window.  It hosts the rootLayer, and responds to events
 @interface SPILDTopLayerView : NSView {
-    CALayer *_rootLayer;
+    CALayer *__weak _rootLayer;
     CALayer *_plainBackgroundLayer;
     CALayer *_qcBackgroundLayer;
     YRKSpinningProgressIndicatorLayer *_progressIndicatorLayer;
@@ -26,7 +26,7 @@
 - (void)setPlainBackgroundColor:(NSColor *)newColor;
 
 // Properties
-@property (readonly) CALayer *rootLayer;
+@property (weak, readonly) CALayer *rootLayer;
 @property (readonly) YRKSpinningProgressIndicatorLayer *progressIndicatorLayer;
 @property (assign) BOOL isAnimatingBackground;
 

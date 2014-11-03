@@ -58,8 +58,6 @@
 {
     self.color = nil;
     [self removeFinLayers];
-
-    [super dealloc];
 }
 
 
@@ -123,11 +121,11 @@
     [self disposeAnimTimer];
 
     // Why animate if not visible?  viewDidMoveToWindow will re-call this method when needed.
-    _animationTimer = [[NSTimer timerWithTimeInterval:(NSTimeInterval)0.05
+    _animationTimer = [NSTimer timerWithTimeInterval:(NSTimeInterval)0.05
                                                target:self
                                              selector:@selector(advancePosition)
                                              userInfo:nil
-                                              repeats:YES] retain];
+                                              repeats:YES];
 
     [_animationTimer setFireDate:[NSDate date]];
     [[NSRunLoop currentRunLoop] addTimer:_animationTimer forMode:NSRunLoopCommonModes];
@@ -138,7 +136,6 @@
 - (void)disposeAnimTimer
 {
     [_animationTimer invalidate];
-    [_animationTimer release];
     _animationTimer = nil;
 }
 
@@ -342,7 +339,6 @@
     for (CALayer *finLayer in _finLayers) {
         [finLayer removeFromSuperlayer];
     }
-    [_finLayers release];
     _finLayers = nil;
 }
 

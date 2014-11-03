@@ -127,7 +127,6 @@
 
 - (void)disposeDeterminateProgressTimer {
     [_determinateProgressTimer invalidate];
-    [_determinateProgressTimer release];
     _determinateProgressTimer = nil;
 }
 
