@@ -228,7 +228,7 @@ typedef struct _YRKFinGeometry {
     }
     _foreColor = cgColor;
 
-    // Update do all of the fins to this new color, at once, immediately
+    // Update all of the fins to this new color, at once, immediately
     [CATransaction begin];
     [CATransaction setValue:@YES forKey:kCATransactionDisableActions];
     for (CALayer *fin in _finLayers) {
