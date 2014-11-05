@@ -15,7 +15,9 @@
     BOOL _isRunning;
     NSTimer *_animationTimer;
     NSUInteger _position;
-
+    
+    NSTimeInterval _indeterminateCycleDuration;
+    
     CGColorRef _foreColor;
     CGFloat _fullOpacity;
     CGFloat _fadeDownOpacity;

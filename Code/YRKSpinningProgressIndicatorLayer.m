@@ -41,6 +41,8 @@
 {
     self = [super init];
     if (self) {
+        _indeterminateCycleDuration = 0.7;
+        
         _position = 0;
         _numFins = 12;
         _finLayers = [[NSMutableArray alloc] initWithCapacity:_numFins];
@@ -329,7 +331,7 @@
         
         // set the fin's fade-out time (for when it's animating)
         CABasicAnimation *anim = [CABasicAnimation animation];
-        anim.duration = 0.7f;
+        anim.duration = _indeterminateCycleDuration;
         NSDictionary* actions = @{@"opacity": anim};
         [newFin setActions:actions];
 
