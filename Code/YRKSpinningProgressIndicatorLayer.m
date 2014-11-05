@@ -8,6 +8,8 @@
 #import "YRKSpinningProgressIndicatorLayer.h"
 
 
+#define TRADITIONAL_MODE    0
+
 typedef struct _YRKFinGeometry {
     CGRect bounds;
     CGPoint anchorPoint;
@@ -17,8 +19,10 @@ typedef struct _YRKFinGeometry {
 
 @interface YRKSpinningProgressIndicatorLayer ()
 
+#if TRADITIONAL_MODE
 // Animation
 - (void)advancePosition;
+#endif
 
 // Helper Methods
 - (void)setupType;
@@ -28,8 +32,10 @@ typedef struct _YRKFinGeometry {
 - (void)removeFinLayers;
 - (void)createFinLayers;
 
+#if TRADITIONAL_MODE
 - (void)setupAnimTimer;
 - (void)disposeAnimTimer;
+#endif
 
 @end
 
@@ -52,6 +58,7 @@ typedef struct _YRKFinGeometry {
         _finLayers = [[NSMutableArray alloc] initWithCapacity:_numFins];
 
         _finLayersRoot = [CALayer layer];
+        //_finLayersRoot.anchorPoint = CGPointMake(0.5, 0.5); // This is the default.
         [self addSublayer:_finLayersRoot];
 
         _fullOpacity = 1.0f;
@@ -83,9 +90,12 @@ typedef struct _YRKFinGeometry {
     [super setBounds:newBounds];
 
     // Resize the fins
-    CGRect bounds = self.bounds;
+    const CGRect bounds = newBounds;
     YRKFinGeometry finGeo = finGeometryForBounds(bounds);
 
+    _finLayersRoot.bounds = bounds;
+    _finLayersRoot.position = yrkCGRectGetCenter(bounds);
+    
     // do the resizing all at once, immediately
     [CATransaction begin];
     [CATransaction setValue:@YES forKey:kCATransactionDisableActions];
@@ -104,6 +114,7 @@ typedef struct _YRKFinGeometry {
 #pragma mark Animation
 //------------------------------------------------------------------------------
 
+#if TRADITIONAL_MODE
 - (void)advancePosition
 {
     _position++;
@@ -146,6 +157,7 @@ typedef struct _YRKFinGeometry {
     [_animationTimer invalidate];
     _animationTimer = nil;
 }
+#endif
 
 - (void)startProgressAnimation
 {
@@ -153,14 +165,22 @@ typedef struct _YRKFinGeometry {
     _isRunning = YES;
     _position = _numFins - 1;
     
+#if TRADITIONAL_MODE
     [self setupAnimTimer];
+#else
+    [self createFinLayers];
+#endif
 }
 
 - (void)stopProgressAnimation
 {
     _isRunning = NO;
 
+#if TRADITIONAL_MODE
     [self disposeAnimTimer];
+#else
+    [self removeFinLayers];
+#endif
 }
 
 //------------------------------------------------------------------------------
@@ -284,15 +304,19 @@ typedef struct _YRKFinGeometry {
 
 - (void)setupIndeterminate {
     [self createFinLayers];
+#if TRADITIONAL_MODE
     if (_isRunning) {
         [self setupAnimTimer];
     }
+#endif
 }
 
 - (void)setupDeterminate {
+#if TRADITIONAL_MODE
     if (_isRunning) {
         [self disposeAnimTimer];
     }
+#endif
     [self removeFinLayers];
     self.hidden = NO;
 }
@@ -300,15 +324,23 @@ typedef struct _YRKFinGeometry {
 - (void)createFinLayers
 {
     [self removeFinLayers];
-
+    
+    const CGRect selfBounds = self.bounds;
+    _finLayersRoot.bounds = selfBounds;
+    _finLayersRoot.position = yrkCGRectGetCenter(selfBounds);
+    
     // Create new fin layers
-    CGRect bounds = self.bounds;
+    const CGRect bounds = _finLayersRoot.bounds;
     YRKFinGeometry finGeo = finGeometryForBounds(bounds);
     
     [CATransaction begin];
     [CATransaction setValue:@YES forKey:kCATransactionDisableActions];
     
     CGFloat rotationAngleBetweenFins = -2 * M_PI/_numFins;
+    
+#if !TRADITIONAL_MODE
+    NSMutableArray *rotationValues = [NSMutableArray array];
+#endif
     
     for (NSUInteger i = 0; i < _numFins; i++) {
         CALayer *newFin = [CALayer layer];
@@ -322,6 +354,7 @@ typedef struct _YRKFinGeometry {
         newFin.cornerRadius = finGeo.cornerRadius;
         newFin.backgroundColor = _foreColor;
 
+#if TRADITIONAL_MODE
         // Set the fin's initial opacity
         newFin.opacity = _fadeDownOpacity;
         
@@ -330,11 +363,34 @@ typedef struct _YRKFinGeometry {
         anim.duration = _indeterminateCycleDuration;
         NSDictionary* actions = @{@"opacity": anim};
         [newFin setActions:actions];
+#else
+        [rotationValues addObject:@(rotationAngle)];
+
+        // Set the fin’s initial opacity.
+        CGFloat fadePercent = 1.0 - (CGFloat)i/(_numFins-1);
+        CGFloat opacity = _fadeDownOpacity + ((_fullOpacity - _fadeDownOpacity) * fadePercent);
+        newFin.opacity = opacity;
+#endif
 
         [_finLayersRoot addSublayer:newFin];
         [_finLayers addObject:newFin];
     }
     
+#if !TRADITIONAL_MODE
+    CAKeyframeAnimation *animation;
+    animation = [CAKeyframeAnimation animationWithKeyPath:@"transform.rotation.z"];
+    animation.beginTime = 0.0;
+    animation.duration = _indeterminateCycleDuration;
+    animation.cumulative = NO;
+    animation.repeatCount = HUGE_VALF;
+    animation.values = rotationValues;
+    animation.removedOnCompletion = NO;
+    animation.calculationMode = kCAAnimationDiscrete;
+    
+    [_finLayersRoot addAnimation:animation
+                          forKey:nil];
+#endif
+
     [CATransaction commit];
 }
 
@@ -370,6 +426,10 @@ CGPoint finAnchorPointForBounds(CGRect bounds) {
     CGFloat minSide = size.width > size.height ? size.height : size.width;
     CGFloat height = minSide * 0.30f;
     return CGPointMake(0.5, -0.9*(minSide-height)/minSide);
+}
+
+CGPoint yrkCGRectGetCenter(CGRect rect) {
+    return CGPointMake(CGRectGetMidX(rect), CGRectGetMidY(rect));
 }
 
 @end
