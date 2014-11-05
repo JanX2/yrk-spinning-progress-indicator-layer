@@ -57,12 +57,13 @@
     _plainBackgroundLayer.bounds = [[self layer] bounds];
     _plainBackgroundLayer.autoresizingMask = (kCALayerWidthSizable|kCALayerHeightSizable);
     _plainBackgroundLayer.zPosition = 0;
-    CGColorRef cgColor = [[NSColor blueColor] CGColor];
+    CGColorRef cgColor = [[NSColor blackColor] CGColor];
     _plainBackgroundLayer.backgroundColor = cgColor;
     [_rootLayer addSublayer:_plainBackgroundLayer];
 
     // Start with QC background
-    [self useQCBackground];
+    //[self useQCBackground];
+    [self usePlainBackground];
 
     // Put a SpinningProgressIndicatorLayer in front of everything
     _progressIndicatorLayer = [[YRKSpinningProgressIndicatorLayer alloc] init];

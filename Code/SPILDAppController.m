@@ -27,12 +27,10 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-    // start with a nice green
-    NSColor *niceGreenColor = [NSColor colorWithCalibratedRed:0.40f green:0.69f blue:0.45f alpha:1.0f];
-    _fgColorWell.color = niceGreenColor;
+    _fgColorWell.color = [NSColor blackColor];
     [self pickNewForeColor:_fgColorWell];
 
-    _bgColorWell.color = [NSColor blueColor];
+    _bgColorWell.color = [NSColor whiteColor];
     [self pickNewBackColor:_bgColorWell];
 }
 

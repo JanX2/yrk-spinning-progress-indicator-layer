@@ -501,7 +501,7 @@
 							<int key="NSNumCols">1</int>
 							<array class="NSMutableArray" key="NSCells">
 								<object class="NSButtonCell" id="262947895">
-									<int key="NSCellFlags">-2080374784</int>
+									<int key="NSCellFlags">67108864</int>
 									<int key="NSCellFlags2">0</int>
 									<string key="NSContents">Animated</string>
 									<reference key="NSSupport" ref="44814848"/>
@@ -518,7 +518,7 @@
 									<int key="NSPeriodicInterval">25</int>
 								</object>
 								<object class="NSButtonCell" id="251355478">
-									<int key="NSCellFlags">67108864</int>
+									<int key="NSCellFlags">-2080374784</int>
 									<int key="NSCellFlags2">0</int>
 									<string key="NSContents">Plain color:</string>
 									<reference key="NSSupport" ref="44814848"/>
