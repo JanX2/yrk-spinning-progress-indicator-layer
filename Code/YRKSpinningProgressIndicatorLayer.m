@@ -48,6 +48,7 @@
         _finLayersRoot = [CALayer layer];
         [self addSublayer:_finLayersRoot];
 
+        _fullOpacity = 1.0f;
         _fadeDownOpacity = 0.0f;
         _isRunning = NO;
         self.color = [NSColor blackColor];
@@ -111,7 +112,7 @@
     // Set the next fin to full opacity, but do it immediately, without any animation
     [CATransaction begin];
     [CATransaction setValue:@YES forKey:kCATransactionDisableActions];
-    fin.opacity = 1.0;
+    fin.opacity = _fullOpacity;
     [CATransaction commit];
 
     // Tell that fin to animate its opacity to transparent.

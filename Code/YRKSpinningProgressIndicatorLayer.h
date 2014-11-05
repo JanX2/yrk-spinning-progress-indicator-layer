@@ -17,6 +17,7 @@
     NSUInteger _position;
 
     CGColorRef _foreColor;
+    CGFloat _fullOpacity;
     CGFloat _fadeDownOpacity;
 
     CALayer *_finLayersRoot;
