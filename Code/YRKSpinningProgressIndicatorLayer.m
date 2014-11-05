@@ -43,6 +43,8 @@
     if (self) {
         _position = 0;
         _numFins = 12;
+        _finLayers = [[NSMutableArray alloc] initWithCapacity:_numFins];
+
         _fadeDownOpacity = 0.0f;
         _isRunning = NO;
         self.color = [NSColor blackColor];
@@ -100,8 +102,8 @@
     if (_position >= _numFins) {
         _position = 0;
     }
-
-    CALayer *fin = (CALayer *)_finLayers[_position];
+    
+    CALayer *fin = (_finLayers.count > 0) ? (CALayer *)_finLayers[_position] : nil;
 
     // Set the next fin to full opacity, but do it immediately, without any animation
     [CATransaction begin];
@@ -300,8 +302,6 @@
     [self removeFinLayers];
 
     // Create new fin layers
-    _finLayers = [[NSMutableArray alloc] initWithCapacity:_numFins];
-
     CGRect finBounds = [self finBoundsForCurrentBounds];
     CGPoint finAnchorPoint = [self finAnchorPointForCurrentBounds];
     CGPoint finPosition = CGPointMake([self bounds].size.width/2, [self bounds].size.height/2);
@@ -339,7 +339,7 @@
     for (CALayer *finLayer in _finLayers) {
         [finLayer removeFromSuperlayer];
     }
-    _finLayers = nil;
+    [_finLayers removeAllObjects];
 }
 
 - (CGRect)finBoundsForCurrentBounds
