@@ -121,8 +121,6 @@ typedef struct _YRKFinGeometry {
 
     // Tell that fin to animate its opacity to transparent.
     fin.opacity = _fadeDownOpacity;
-
-    [self setNeedsDisplay];
 }
 
 - (void)setupAnimTimer
@@ -155,8 +153,6 @@ typedef struct _YRKFinGeometry {
     _isRunning = YES;
     _position = _numFins - 1;
     
-    [self setNeedsDisplay];
-
     [self setupAnimTimer];
 }
 
@@ -165,8 +161,6 @@ typedef struct _YRKFinGeometry {
     _isRunning = NO;
 
     [self disposeAnimTimer];
-
-    [self setNeedsDisplay];
 }
 
 //------------------------------------------------------------------------------
@@ -241,8 +235,6 @@ typedef struct _YRKFinGeometry {
         fin.backgroundColor = cgColor;
     }
     [CATransaction commit];
-    
-    [self setNeedsDisplay];
 }
 
 // Can't use @synthesize because we need the custom setters and atomic properties
