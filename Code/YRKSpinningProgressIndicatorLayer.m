@@ -21,9 +21,6 @@
 - (void)removeFinLayers;
 - (void)createFinLayers;
 
-@property (nonatomic, readonly) CGRect finBoundsForCurrentBounds;
-@property (nonatomic, readonly) CGPoint finAnchorPointForCurrentBounds;
-
 - (void)setupAnimTimer;
 - (void)disposeAnimTimer;
 
@@ -79,8 +76,9 @@
     [super setBounds:newBounds];
 
     // Resize the fins
-    CGRect finBounds = [self finBoundsForCurrentBounds];
-    CGPoint finAnchorPoint = [self finAnchorPointForCurrentBounds];
+    CGRect bounds = self.bounds;
+    CGRect finBounds = [self finBoundsForBounds:bounds];
+    CGPoint finAnchorPoint = [self finAnchorPointForBounds:bounds];
     CGPoint finPosition = CGPointMake([self bounds].size.width/2, [self bounds].size.height/2);
     CGFloat finCornerRadius = finBounds.size.width/2;
 
@@ -308,8 +306,9 @@
     [self removeFinLayers];
 
     // Create new fin layers
-    CGRect finBounds = [self finBoundsForCurrentBounds];
-    CGPoint finAnchorPoint = [self finAnchorPointForCurrentBounds];
+    CGRect bounds = self.bounds;
+    CGRect finBounds = [self finBoundsForBounds:bounds];
+    CGPoint finAnchorPoint = [self finAnchorPointForBounds:bounds];
     CGPoint finPosition = CGPointMake([self bounds].size.width/2, [self bounds].size.height/2);
     CGFloat finCornerRadius = finBounds.size.width/2;
 
@@ -354,18 +353,18 @@
     [_finLayers removeAllObjects];
 }
 
-- (CGRect)finBoundsForCurrentBounds
+- (CGRect)finBoundsForBounds:(CGRect)bounds
 {
-    CGSize size = [self bounds].size;
+    CGSize size = bounds.size;
     CGFloat minSide = size.width > size.height ? size.height : size.width;
     CGFloat width = minSide * 0.095f;
     CGFloat height = minSide * 0.30f;
     return CGRectMake(0,0,width,height);
 }
 
-- (CGPoint)finAnchorPointForCurrentBounds
+- (CGPoint)finAnchorPointForBounds:(CGRect)bounds
 {
-    CGSize size = [self bounds].size;
+    CGSize size = bounds.size;
     CGFloat minSide = size.width > size.height ? size.height : size.width;
     CGFloat height = minSide * 0.30f;
     return CGPointMake(0.5, -0.9*(minSide-height)/minSide);
