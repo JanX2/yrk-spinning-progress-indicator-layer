@@ -80,6 +80,29 @@
 
 //------------------------------------------------------------------------------
 #pragma mark -
+#pragma mark UI event handling
+//------------------------------------------------------------------------------
+
+// Need to handle mouse events to trap/block input.
+
+- (void)mouseDown:(NSEvent *)event
+{
+    //NSLog(@"%@", NSStringFromSelector(_cmd));
+}
+
+- (void)mouseDragged:(NSEvent *)event
+{
+    //NSLog(@"%@", NSStringFromSelector(_cmd));
+}
+
+- (void)mouseUp:(NSEvent *)event
+{
+    //NSLog(@"%@", NSStringFromSelector(_cmd));
+}
+
+
+//------------------------------------------------------------------------------
+#pragma mark -
 #pragma mark Toggling Background
 //------------------------------------------------------------------------------
 
