@@ -310,7 +310,7 @@
     CGPoint finPosition = CGPointMake([self bounds].size.width/2, [self bounds].size.height/2);
     CGFloat finCornerRadius = finBounds.size.width/2;
 
-    for (NSUInteger i=0; i<_numFins; i++) {
+    for (NSUInteger i = 0; i < _numFins; i++) {
         CALayer *newFin = [CALayer layer];
 
         newFin.bounds = finBounds;
