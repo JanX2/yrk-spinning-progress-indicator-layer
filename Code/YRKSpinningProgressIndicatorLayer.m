@@ -329,7 +329,7 @@
         NSDictionary* actions = @{@"opacity": anim};
         [newFin setActions:actions];
 
-        [self addSublayer: newFin];
+        [self addSublayer:newFin];
         [_finLayers addObject:newFin];
     }
 }
