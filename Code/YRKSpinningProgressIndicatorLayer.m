@@ -8,6 +8,13 @@
 #import "YRKSpinningProgressIndicatorLayer.h"
 
 
+typedef struct _YRKFinGeometry {
+    CGRect bounds;
+    CGPoint anchorPoint;
+    CGPoint position;
+    CGFloat cornerRadius;
+} YRKFinGeometry;
+
 @interface YRKSpinningProgressIndicatorLayer ()
 
 // Animation
@@ -77,19 +84,16 @@
 
     // Resize the fins
     CGRect bounds = self.bounds;
-    CGRect finBounds = [self finBoundsForBounds:bounds];
-    CGPoint finAnchorPoint = [self finAnchorPointForBounds:bounds];
-    CGPoint finPosition = CGPointMake([self bounds].size.width/2, [self bounds].size.height/2);
-    CGFloat finCornerRadius = finBounds.size.width/2;
+    YRKFinGeometry finGeo = finGeometryForBounds(bounds);
 
     // do the resizing all at once, immediately
     [CATransaction begin];
     [CATransaction setValue:@YES forKey:kCATransactionDisableActions];
     for (CALayer *fin in _finLayers) {
-        fin.bounds = finBounds;
-        fin.anchorPoint = finAnchorPoint;
-        fin.position = finPosition;
-        fin.cornerRadius = finCornerRadius;
+        fin.bounds = finGeo.bounds;
+        fin.anchorPoint = finGeo.anchorPoint;
+        fin.position = finGeo.position;
+        fin.cornerRadius = finGeo.cornerRadius;
     }
     [CATransaction commit];
 }
@@ -307,11 +311,8 @@
 
     // Create new fin layers
     CGRect bounds = self.bounds;
-    CGRect finBounds = [self finBoundsForBounds:bounds];
-    CGPoint finAnchorPoint = [self finAnchorPointForBounds:bounds];
-    CGPoint finPosition = CGPointMake([self bounds].size.width/2, [self bounds].size.height/2);
-    CGFloat finCornerRadius = finBounds.size.width/2;
-
+    YRKFinGeometry finGeo = finGeometryForBounds(bounds);
+    
     [CATransaction begin];
     [CATransaction setValue:@YES forKey:kCATransactionDisableActions];
     
@@ -322,11 +323,11 @@
         
         CGFloat rotationAngle = i * rotationAngleBetweenFins;
         
-        newFin.bounds = finBounds;
-        newFin.anchorPoint = finAnchorPoint;
-        newFin.position = finPosition;
+        newFin.bounds = finGeo.bounds;
+        newFin.anchorPoint = finGeo.anchorPoint;
+        newFin.position = finGeo.position;
         newFin.transform = CATransform3DMakeRotation(rotationAngle, 0.0, 0.0, 1.0);
-        newFin.cornerRadius = finCornerRadius;
+        newFin.cornerRadius = finGeo.cornerRadius;
         newFin.backgroundColor = _foreColor;
 
         // Set the fin's initial opacity
@@ -353,8 +354,18 @@
     [_finLayers removeAllObjects];
 }
 
-- (CGRect)finBoundsForBounds:(CGRect)bounds
-{
+YRKFinGeometry finGeometryForBounds(CGRect bounds) {
+    YRKFinGeometry finGeometry;
+    
+    finGeometry.bounds = finBoundsForBounds(bounds);
+    finGeometry.anchorPoint = finAnchorPointForBounds(bounds);
+    finGeometry.position = CGPointMake(bounds.size.width/2, bounds.size.height/2);
+    finGeometry.cornerRadius = finGeometry.bounds.size.width/2;
+    
+    return finGeometry;
+}
+
+CGRect finBoundsForBounds(CGRect bounds) {
     CGSize size = bounds.size;
     CGFloat minSide = size.width > size.height ? size.height : size.width;
     CGFloat width = minSide * 0.095f;
@@ -362,8 +373,7 @@
     return CGRectMake(0,0,width,height);
 }
 
-- (CGPoint)finAnchorPointForBounds:(CGRect)bounds
-{
+CGPoint finAnchorPointForBounds(CGRect bounds) {
     CGSize size = bounds.size;
     CGFloat minSide = size.width > size.height ? size.height : size.width;
     CGFloat height = minSide * 0.30f;
