@@ -45,6 +45,9 @@
         _numFins = 12;
         _finLayers = [[NSMutableArray alloc] initWithCapacity:_numFins];
 
+        _finLayersRoot = [CALayer layer];
+        [self addSublayer:_finLayersRoot];
+
         _fadeDownOpacity = 0.0f;
         _isRunning = NO;
         self.color = [NSColor blackColor];
@@ -329,7 +332,7 @@
         NSDictionary* actions = @{@"opacity": anim};
         [newFin setActions:actions];
 
-        [self addSublayer:newFin];
+        [_finLayersRoot addSublayer:newFin];
         [_finLayers addObject:newFin];
     }
 }

@@ -19,6 +19,7 @@
     CGColorRef _foreColor;
     CGFloat _fadeDownOpacity;
 
+    CALayer *_finLayersRoot;
     NSUInteger _numFins;
     NSMutableArray *_finLayers;
 
