@@ -311,6 +311,9 @@
     CGPoint finPosition = CGPointMake([self bounds].size.width/2, [self bounds].size.height/2);
     CGFloat finCornerRadius = finBounds.size.width/2;
 
+    [CATransaction begin];
+    [CATransaction setValue:@YES forKey:kCATransactionDisableActions];
+    
     for (NSUInteger i = 0; i < _numFins; i++) {
         CALayer *newFin = [CALayer layer];
 
@@ -322,11 +325,8 @@
         newFin.backgroundColor = _foreColor;
 
         // Set the fin's initial opacity
-        [CATransaction begin];
-        [CATransaction setValue:@YES forKey:kCATransactionDisableActions];
         newFin.opacity = _fadeDownOpacity;
-        [CATransaction commit];
-
+        
         // set the fin's fade-out time (for when it's animating)
         CABasicAnimation *anim = [CABasicAnimation animation];
         anim.duration = 0.7f;
@@ -336,6 +336,8 @@
         [_finLayersRoot addSublayer:newFin];
         [_finLayers addObject:newFin];
     }
+    
+    [CATransaction commit];
 }
 
 - (void)removeFinLayers
