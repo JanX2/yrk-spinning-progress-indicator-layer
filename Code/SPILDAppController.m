@@ -32,6 +32,8 @@
 
     _bgColorWell.color = [NSColor whiteColor];
     [self pickNewBackColor:_bgColorWell];
+    
+    [self startStopProgressIndicator:self];
 }
 
 
