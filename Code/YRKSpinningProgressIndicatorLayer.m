@@ -316,13 +316,17 @@
     [CATransaction begin];
     [CATransaction setValue:@YES forKey:kCATransactionDisableActions];
     
+    CGFloat rotationAngleBetweenFins = -2 * M_PI/_numFins;
+    
     for (NSUInteger i = 0; i < _numFins; i++) {
         CALayer *newFin = [CALayer layer];
-
+        
+        CGFloat rotationAngle = i * rotationAngleBetweenFins;
+        
         newFin.bounds = finBounds;
         newFin.anchorPoint = finAnchorPoint;
         newFin.position = finPosition;
-        newFin.transform = CATransform3DMakeRotation(i*(-2*M_PI/_numFins), 0.0, 0.0, 1.0);
+        newFin.transform = CATransform3DMakeRotation(rotationAngle, 0.0, 0.0, 1.0);
         newFin.cornerRadius = finCornerRadius;
         newFin.backgroundColor = _foreColor;
 
