@@ -229,9 +229,6 @@ typedef struct _YRKFinGeometry {
 #pragma mark Properties and Accessors
 //------------------------------------------------------------------------------
 
-@synthesize maxValue = _maxValue;
-@synthesize isRunning = _isRunning;
-
 // Can't use @synthesize because we need to convert NSColor <-> CGColor
 - (NSColor *)color
 {

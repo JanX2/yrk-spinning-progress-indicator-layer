@@ -12,7 +12,6 @@
 @interface YRKSpinningProgressIndicatorLayer : CALayer {
     BOOL _isDeterminate;
 
-    BOOL _isRunning;
     NSTimer *_animationTimer;
     NSUInteger _position;
     
@@ -26,7 +25,6 @@
     NSUInteger _numFins;
     NSMutableArray *_finLayers;
 
-    double _maxValue;
     double _doubleValue;
 }
 
