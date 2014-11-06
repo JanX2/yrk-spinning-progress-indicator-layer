@@ -35,10 +35,10 @@
 - (void)stopProgressAnimation;
 
 // Properties and Accessors
-@property (readonly) BOOL isRunning;
-@property (assign) BOOL isDeterminate;
-@property (assign) double maxValue;
-@property (assign) double doubleValue;
+@property (readonly, assign) BOOL isRunning;
+@property (readwrite, assign) BOOL isDeterminate;
+@property (readwrite, assign) double maxValue;
+@property (readwrite, assign) double doubleValue;
 @property (readwrite, copy) NSColor *color;  // "copy" because we don't retain it -- we create a CGColor from it
 
 @end
