@@ -73,7 +73,6 @@
     _progressIndicatorLayer.bounds = [[self layer] bounds];
     _progressIndicatorLayer.autoresizingMask = (kCALayerWidthSizable|kCALayerHeightSizable);
     _progressIndicatorLayer.zPosition = 10; // make sure it goes in front of the background layer
-    _progressIndicatorLayer.hidden = YES;
     [_rootLayer addSublayer:_progressIndicatorLayer];
 }
 

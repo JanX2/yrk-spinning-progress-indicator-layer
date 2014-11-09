@@ -182,7 +182,6 @@ typedef struct _YRKFinGeometry {
 
 - (void)startProgressAnimation
 {
-    self.hidden = NO;
     _isRunning = YES;
     _position = _numFins - 1;
     
@@ -339,7 +338,6 @@ typedef struct _YRKFinGeometry {
     }
 #endif
     [self removeFinLayers];
-    self.hidden = NO;
 }
 
 - (void)createFinLayers
