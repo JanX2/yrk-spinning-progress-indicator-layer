@@ -68,7 +68,7 @@ typedef struct _YRKFinGeometry {
         [self addSublayer:_finLayersRoot];
 
         _fullOpacity = 1.0f;
-        _fadeDownOpacity = 0.0f;
+        _fadeDownOpacity = 0.05f;
         _isRunning = NO;
         self.color = [NSColor blackColor];
         [self setBounds:CGRectMake(0.0f, 0.0f, 10.0f, 10.0f)];
