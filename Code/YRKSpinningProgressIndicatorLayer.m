@@ -10,6 +10,10 @@
 
 #define TRADITIONAL_MODE    0
 
+#if !TRADITIONAL_MODE
+NSString * const RotationAnimationKey = @"rotationAnimation";
+#endif
+
 typedef struct _YRKFinGeometry {
     CGRect bounds;
     CGPoint anchorPoint;
@@ -46,6 +50,9 @@ typedef struct _YRKFinGeometry {
     
     CALayer *_finLayersRoot;
     NSMutableArray *_finLayers;
+#if !TRADITIONAL_MODE
+    NSMutableArray *_finLayerRotationValues;
+#endif
 }
 
 //------------------------------------------------------------------------------
@@ -67,6 +74,10 @@ typedef struct _YRKFinGeometry {
         //_finLayersRoot.anchorPoint = CGPointMake(0.5, 0.5); // This is the default.
         [self addSublayer:_finLayersRoot];
 
+#if !TRADITIONAL_MODE
+        _finLayerRotationValues = [NSMutableArray array];
+#endif
+        
         _fullOpacity = 1.0f;
         _fadeDownOpacity = 0.05f;
         _isRunning = NO;
@@ -342,7 +353,7 @@ typedef struct _YRKFinGeometry {
     CGFloat rotationAngleBetweenFins = -2 * M_PI/_numFins;
     
 #if !TRADITIONAL_MODE
-    NSMutableArray *rotationValues = [NSMutableArray array];
+    [_finLayerRotationValues removeAllObjects];
 #endif
     
     for (NSUInteger i = 0; i < _numFins; i++) {
@@ -360,14 +371,8 @@ typedef struct _YRKFinGeometry {
 #if TRADITIONAL_MODE
         // Set the fin's initial opacity
         newFin.opacity = _fadeDownOpacity;
-        
-        // set the fin's fade-out time (for when it's animating)
-        CABasicAnimation *anim = [CABasicAnimation animation];
-        anim.duration = _indeterminateCycleDuration;
-        NSDictionary* actions = @{@"opacity": anim};
-        [newFin setActions:actions];
 #else
-        [rotationValues addObject:@(rotationAngle)];
+        [_finLayerRotationValues addObject:@(rotationAngle)];
 
         // Set the fin’s opacity.
         CGFloat fadePercent = 1.0 - (CGFloat)i/(_numFins-1);
@@ -378,19 +383,58 @@ typedef struct _YRKFinGeometry {
         [_finLayersRoot addSublayer:newFin];
         [_finLayers addObject:newFin];
     }
+
+    [CATransaction commit];
     
-#if !TRADITIONAL_MODE
+    [self animateFinLayers];
+}
+
+- (void)animateFinLayers
+{
+    [CATransaction begin];
+    [CATransaction setValue:@YES forKey:kCATransactionDisableActions];
+    
+    [self deanimateFinLayers];
+    
+#if TRADITIONAL_MODE
+    for (CALayer *finLayer in _finLayers) {
+        // Set the fin’s initial opacity.
+        finLayer.opacity = _fadeDownOpacity;
+        
+        // set the fin's fade-out time (for when it's animating)
+        CABasicAnimation *animation = [CABasicAnimation animation];
+        animation.duration = _indeterminateCycleDuration;
+        NSDictionary *actions = @{@"opacity": animation};
+        [finLayer setActions:actions];
+    }
+#else
     CAKeyframeAnimation *animation;
     animation = [CAKeyframeAnimation animationWithKeyPath:@"transform.rotation.z"];
     animation.duration = _indeterminateCycleDuration;
     animation.cumulative = NO;
     animation.repeatCount = HUGE_VALF;
-    animation.values = rotationValues;
+    animation.values = _finLayerRotationValues;
     animation.removedOnCompletion = NO;
     animation.calculationMode = kCAAnimationDiscrete;
     
     [_finLayersRoot addAnimation:animation
-                          forKey:nil];
+                          forKey:RotationAnimationKey];
+#endif
+    
+    [CATransaction commit];
+}
+
+- (void)deanimateFinLayers
+{
+    [CATransaction begin];
+    [CATransaction setValue:@YES forKey:kCATransactionDisableActions];
+    
+#if TRADITIONAL_MODE
+    for (CALayer *finLayer in _finLayers) {
+        [finLayer setActions:nil];
+    }
+#else
+    [_finLayersRoot removeAnimationForKey:RotationAnimationKey];
 #endif
     
     [CATransaction commit];
