@@ -53,6 +53,8 @@ typedef struct _YRKFinGeometry {
 #if !TRADITIONAL_MODE
     NSMutableArray *_finLayerRotationValues;
 #endif
+    
+    double _doubleValue;
 }
 
 //------------------------------------------------------------------------------

@@ -19,8 +19,6 @@
     CGFloat _fadeDownOpacity;
 
     NSUInteger _numFins;
-
-    double _doubleValue;
 }
 
 - (void)toggleProgressAnimation;
