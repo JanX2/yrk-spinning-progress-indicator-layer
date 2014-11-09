@@ -451,7 +451,7 @@ typedef struct _YRKFinGeometry {
     [_finLayers removeAllObjects];
 }
 
-YRKFinGeometry finGeometryForBounds(CGRect bounds) {
+static YRKFinGeometry finGeometryForBounds(CGRect bounds) {
     YRKFinGeometry finGeometry;
     
     finGeometry.bounds = finBoundsForBounds(bounds);
@@ -462,7 +462,7 @@ YRKFinGeometry finGeometryForBounds(CGRect bounds) {
     return finGeometry;
 }
 
-CGRect finBoundsForBounds(CGRect bounds) {
+static CGRect finBoundsForBounds(CGRect bounds) {
     CGSize size = bounds.size;
     CGFloat minSide = size.width > size.height ? size.height : size.width;
     CGFloat width = minSide * 0.095f;
@@ -470,14 +470,14 @@ CGRect finBoundsForBounds(CGRect bounds) {
     return CGRectMake(0,0,width,height);
 }
 
-CGPoint finAnchorPointForBounds(CGRect bounds) {
+static CGPoint finAnchorPointForBounds(CGRect bounds) {
     CGSize size = bounds.size;
     CGFloat minSide = size.width > size.height ? size.height : size.width;
     CGFloat height = minSide * 0.30f;
     return CGPointMake(0.5, -0.9*(minSide-height)/minSide);
 }
 
-CGPoint yrkCGRectGetCenter(CGRect rect) {
+static CGPoint yrkCGRectGetCenter(CGRect rect) {
     return CGPointMake(CGRectGetMidX(rect), CGRectGetMidY(rect));
 }
 
