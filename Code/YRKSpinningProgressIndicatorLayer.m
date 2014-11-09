@@ -382,7 +382,6 @@ typedef struct _YRKFinGeometry {
 #if !TRADITIONAL_MODE
     CAKeyframeAnimation *animation;
     animation = [CAKeyframeAnimation animationWithKeyPath:@"transform.rotation.z"];
-    animation.beginTime = 0.0;
     animation.duration = _indeterminateCycleDuration;
     animation.cumulative = NO;
     animation.repeatCount = HUGE_VALF;
