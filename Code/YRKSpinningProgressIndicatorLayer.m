@@ -387,7 +387,7 @@ typedef struct _YRKFinGeometry {
     [_finLayersRoot addAnimation:animation
                           forKey:nil];
 #endif
-
+    
     [CATransaction commit];
 }
 
