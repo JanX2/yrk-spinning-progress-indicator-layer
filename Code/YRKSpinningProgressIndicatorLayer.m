@@ -86,6 +86,8 @@ typedef struct _YRKFinGeometry {
         self.isDeterminate = NO;
         self.doubleValue = 0;
         self.maxValue = 100;
+        
+        [self createFinLayers];
     }
     return self;
 }
@@ -184,20 +186,24 @@ typedef struct _YRKFinGeometry {
     
 #if TRADITIONAL_MODE
     [self setupAnimTimer];
-#else
-    [self createFinLayers];
 #endif
+    
+    [self addSublayer:_finLayersRoot];
+    
+    [self animateFinLayers];
 }
 
 - (void)stopProgressAnimation
 {
     _isRunning = NO;
 
+    [self deanimateFinLayers];
+    
 #if TRADITIONAL_MODE
     [self disposeAnimTimer];
-#else
-    [self removeFinLayers];
 #endif
+
+    [_finLayersRoot removeFromSuperlayer];
 }
 
 //------------------------------------------------------------------------------
@@ -317,7 +323,6 @@ typedef struct _YRKFinGeometry {
 }
 
 - (void)setupIndeterminate {
-    [self createFinLayers];
 #if TRADITIONAL_MODE
     if (_isRunning) {
         [self setupAnimTimer];
@@ -385,8 +390,6 @@ typedef struct _YRKFinGeometry {
     }
 
     [CATransaction commit];
-    
-    [self animateFinLayers];
 }
 
 - (void)animateFinLayers
