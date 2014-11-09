@@ -110,6 +110,9 @@ typedef struct _YRKFinGeometry {
 {
     [super setBounds:newBounds];
 
+    [CATransaction begin];
+    [CATransaction setValue:@YES forKey:kCATransactionDisableActions];
+    
     // Resize the fins
     const CGRect bounds = newBounds;
     YRKFinGeometry finGeo = finGeometryForBounds(bounds);
@@ -118,14 +121,13 @@ typedef struct _YRKFinGeometry {
     _finLayersRoot.position = yrkCGRectGetCenter(bounds);
     
     // do the resizing all at once, immediately
-    [CATransaction begin];
-    [CATransaction setValue:@YES forKey:kCATransactionDisableActions];
     for (CALayer *fin in _finLayers) {
         fin.bounds = finGeo.bounds;
         fin.anchorPoint = finGeo.anchorPoint;
         fin.position = finGeo.position;
         fin.cornerRadius = finGeo.cornerRadius;
     }
+    
     [CATransaction commit];
 }
 
