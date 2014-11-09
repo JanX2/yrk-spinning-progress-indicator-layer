@@ -12,18 +12,13 @@
 @interface YRKSpinningProgressIndicatorLayer : CALayer {
     BOOL _isDeterminate;
 
-    NSTimer *_animationTimer;
-    NSUInteger _position;
-    
     NSTimeInterval _indeterminateCycleDuration;
     
     CGColorRef _foreColor;
     CGFloat _fullOpacity;
     CGFloat _fadeDownOpacity;
 
-    CALayer *_finLayersRoot;
     NSUInteger _numFins;
-    NSMutableArray *_finLayers;
 
     double _doubleValue;
 }

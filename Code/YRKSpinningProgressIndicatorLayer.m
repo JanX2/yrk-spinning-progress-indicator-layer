@@ -40,7 +40,13 @@ typedef struct _YRKFinGeometry {
 @end
 
 
-@implementation YRKSpinningProgressIndicatorLayer
+@implementation YRKSpinningProgressIndicatorLayer {
+    NSTimer *_animationTimer;
+    NSUInteger _position;
+    
+    CALayer *_finLayersRoot;
+    NSMutableArray *_finLayers;
+}
 
 //------------------------------------------------------------------------------
 #pragma mark -
