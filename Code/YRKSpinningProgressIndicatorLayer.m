@@ -363,7 +363,7 @@ typedef struct _YRKFinGeometry {
 #else
         [rotationValues addObject:@(rotationAngle)];
 
-        // Set the fin’s initial opacity.
+        // Set the fin’s opacity.
         CGFloat fadePercent = 1.0 - (CGFloat)i/(_numFins-1);
         CGFloat opacity = _fadeDownOpacity + ((_fullOpacity - _fadeDownOpacity) * fadePercent);
         newFin.opacity = opacity;
