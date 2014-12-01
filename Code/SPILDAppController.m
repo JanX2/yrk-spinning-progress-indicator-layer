@@ -76,27 +76,37 @@
 {
     if ([[_mainView progressIndicatorLayer] isRunning] || (_determinateProgressTimer != nil)) {
         // it is running, so stop it
-        if (_mainView.progressIndicatorLayer.isDeterminate) {
-            [self disposeDeterminateProgressTimer];
-            _mainView.progressIndicatorLayer.doubleValue = 0;
-        }
-        else {
-            [[_mainView progressIndicatorLayer] stopProgressAnimation];
-        }
-
-        [_startStopButton setTitle:@"Start"];
+        [self stopProgressIndicator:sender];
     }
     else {
         // it is stopped, so start it
-        if (_mainView.progressIndicatorLayer.isDeterminate) {
-            [self setupDeterminateProgressTimer];
-        } 
-        else {
-            [[_mainView progressIndicatorLayer] startProgressAnimation];
-        }
-
-        [_startStopButton setTitle:@"Stop"];
+        [self startProgressIndicator:sender];
     }
+}
+
+- (IBAction)startProgressIndicator:(id)sender
+{
+    if (_mainView.progressIndicatorLayer.isDeterminate) {
+        [self setupDeterminateProgressTimer];
+    }
+    else {
+        [[_mainView progressIndicatorLayer] startProgressAnimation];
+    }
+    
+    [_startStopButton setTitle:@"Stop"];
+}
+
+- (IBAction)stopProgressIndicator:(id)sender
+{
+    if (_mainView.progressIndicatorLayer.isDeterminate) {
+        [self disposeDeterminateProgressTimer];
+        _mainView.progressIndicatorLayer.doubleValue = 0;
+    }
+    else {
+        [[_mainView progressIndicatorLayer] stopProgressAnimation];
+    }
+    
+    [_startStopButton setTitle:@"Start"];
 }
 
 //------------------------------------------------------------------------------
