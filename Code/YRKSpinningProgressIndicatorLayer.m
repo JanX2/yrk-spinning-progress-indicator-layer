@@ -469,7 +469,7 @@ static CGRect finBoundsForBounds(CGRect bounds) {
     CGFloat minSide = size.width > size.height ? size.height : size.width;
     CGFloat width = minSide * 0.095f;
     CGFloat height = minSide * 0.30f;
-    return CGRectMake(0,0,width,height);
+    return CGRectMake(0, 0, width, height);
 }
 
 static CGPoint finAnchorPointForBounds(CGRect bounds) {
