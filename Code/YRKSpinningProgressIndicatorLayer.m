@@ -457,26 +457,30 @@ static YRKFinGeometry finGeometryForBounds(CGRect bounds) {
     YRKFinGeometry finGeometry;
     
     finGeometry.bounds = finBoundsForBounds(bounds);
-    finGeometry.anchorPoint = finAnchorPointForBounds(bounds);
+    finGeometry.anchorPoint = finAnchorPoint();
     finGeometry.position = CGPointMake(bounds.size.width/2, bounds.size.height/2);
     finGeometry.cornerRadius = finGeometry.bounds.size.width/2;
     
     return finGeometry;
 }
 
+const CGFloat finWidthPercent = 0.095;
+const CGFloat finHeightPercent = 0.30;
+const CGFloat finAnchorPointVerticalOffsetPercent = -0.9;
+
 static CGRect finBoundsForBounds(CGRect bounds) {
     CGSize size = bounds.size;
     CGFloat minSide = shorterDimensionForSize(size);
-    CGFloat width = minSide * 0.095f;
-    CGFloat height = minSide * 0.30f;
+    
+    CGFloat width = minSide * finWidthPercent;
+    CGFloat height = minSide * finHeightPercent;
+    
     return CGRectMake(0, 0, width, height);
 }
 
-static CGPoint finAnchorPointForBounds(CGRect bounds) {
-    CGSize size = bounds.size;
-    CGFloat minSide = shorterDimensionForSize(size);
-    CGFloat height = minSide * 0.30f;
-    return CGPointMake(0.5, -0.9*(minSide-height)/minSide);
+static CGPoint finAnchorPoint() {
+    // Horizentally centered, vertically offset.
+    return CGPointMake(0.5, finAnchorPointVerticalOffsetPercent * (1.0 - finHeightPercent));
 }
 
 static CGPoint yrkCGRectGetCenter(CGRect rect) {
