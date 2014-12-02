@@ -16,6 +16,7 @@
     IBOutlet SPILDTopLayerView *__weak _mainView;
 
     IBOutlet NSButton *_startStopButton;
+    IBOutlet NSMatrix *_progressIndicatorType;
     IBOutlet NSColorWell *_fgColorWell;
     IBOutlet NSColorWell *_bgColorWell;
     

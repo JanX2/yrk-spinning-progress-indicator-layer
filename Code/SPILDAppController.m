@@ -33,6 +33,9 @@
     _bgColorWell.color = [NSColor whiteColor];
     [self pickNewBackColor:_bgColorWell];
     
+    [_progressIndicatorType selectCell:[_progressIndicatorType cellWithTag:2]];
+    [self selectDeterminateProgressIndicator:self];
+
     [self startStopProgressIndicator:self];
 }
 
