@@ -466,7 +466,7 @@ static YRKFinGeometry finGeometryForBounds(CGRect bounds) {
 
 static CGRect finBoundsForBounds(CGRect bounds) {
     CGSize size = bounds.size;
-    CGFloat minSide = size.width > size.height ? size.height : size.width;
+    CGFloat minSide = shorterDimensionForSize(size);
     CGFloat width = minSide * 0.095f;
     CGFloat height = minSide * 0.30f;
     return CGRectMake(0, 0, width, height);
@@ -474,13 +474,17 @@ static CGRect finBoundsForBounds(CGRect bounds) {
 
 static CGPoint finAnchorPointForBounds(CGRect bounds) {
     CGSize size = bounds.size;
-    CGFloat minSide = size.width > size.height ? size.height : size.width;
+    CGFloat minSide = shorterDimensionForSize(size);
     CGFloat height = minSide * 0.30f;
     return CGPointMake(0.5, -0.9*(minSide-height)/minSide);
 }
 
 static CGPoint yrkCGRectGetCenter(CGRect rect) {
     return CGPointMake(CGRectGetMidX(rect), CGRectGetMidY(rect));
+}
+
+static inline CGFloat shorterDimensionForSize(CGSize size) {
+    return MIN(size.width, size.height);
 }
 
 @end
