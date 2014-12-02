@@ -466,7 +466,7 @@ static YRKFinGeometry finGeometryForBounds(CGRect bounds) {
 
 const CGFloat finWidthPercent = 0.095;
 const CGFloat finHeightPercent = 0.30;
-const CGFloat finAnchorPointVerticalOffsetPercent = -0.9;
+const CGFloat finAnchorPointVerticalOffsetPercent = -0.63; // Aesthetically pleasing value. Also indirectly determines margin.
 
 static CGRect finBoundsForBounds(CGRect bounds) {
     CGSize size = bounds.size;
@@ -480,7 +480,7 @@ static CGRect finBoundsForBounds(CGRect bounds) {
 
 static CGPoint finAnchorPoint() {
     // Horizentally centered, vertically offset.
-    return CGPointMake(0.5, finAnchorPointVerticalOffsetPercent * (1.0 - finHeightPercent));
+    return CGPointMake(0.5, finAnchorPointVerticalOffsetPercent);
 }
 
 static CGPoint yrkCGRectGetCenter(CGRect rect) {
