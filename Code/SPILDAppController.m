@@ -19,7 +19,8 @@
 @end
 
 @implementation SPILDAppController {
-    NSUInteger _waitTicks;
+    NSUInteger _initialWaitTicks;
+    NSUInteger _finalWaitTicks;
 }
 
 //------------------------------------------------------------------------------
@@ -148,24 +149,33 @@
 #pragma mark Helpers
 //------------------------------------------------------------------------------
 
+const NSUInteger initialWait = 20;
+const NSUInteger finalWait = 40;
+
 - (void)advanceDeterminateTimer:(NSTimer *)timer {
     // 200 times 0.05s should make a full progress in 10s.
 
     if (_mainView.progressIndicatorLayer.doubleValue >= _mainView.progressIndicatorLayer.maxValue) {
-        if (_waitTicks >= 40) {
+        if (_finalWaitTicks == 0) {
             _mainView.progressIndicatorLayer.doubleValue = 0.0;
+            _initialWaitTicks = 0;
+            _finalWaitTicks = finalWait;
         }
-        _waitTicks++;
+        _finalWaitTicks--;
     }
     else {
-        _mainView.progressIndicatorLayer.doubleValue += 0.5;
+        if (_initialWaitTicks >= initialWait) {
+            _mainView.progressIndicatorLayer.doubleValue += 0.5;
+        }
+        _initialWaitTicks++;
     }
 }
 
 - (void)setupDeterminateProgressTimer {
     [self disposeDeterminateProgressTimer];
-    _waitTicks = 0;
-    
+    _initialWaitTicks = 0;
+    _finalWaitTicks = finalWait;
+
     _determinateProgressTimer = [[NSTimer alloc] initWithFireDate:[NSDate date] 
                                                          interval:0.05
                                                            target:self 
