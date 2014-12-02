@@ -130,7 +130,7 @@
 {
     if (_mainView.progressIndicatorLayer.isDeterminate) {
         [self disposeDeterminateProgressTimer];
-        _mainView.progressIndicatorLayer.doubleValue = 0;
+        _mainView.progressIndicatorLayer.doubleValue = 0.0;
     }
     else {
         [[_mainView progressIndicatorLayer] stopProgressAnimation];
@@ -146,17 +146,20 @@
 
 - (void)advanceDeterminateTimer:(NSTimer *)timer {
     // 200 times 0.05s should make a full progress in 10s.
-    _mainView.progressIndicatorLayer.doubleValue += 0.5f;
 
-    if (_mainView.progressIndicatorLayer.doubleValue >= 100)
-        _mainView.progressIndicatorLayer.doubleValue = 0;
+    if (_mainView.progressIndicatorLayer.doubleValue >= _mainView.progressIndicatorLayer.maxValue) {
+        _mainView.progressIndicatorLayer.doubleValue = 0.0;
+    }
+    else {
+        _mainView.progressIndicatorLayer.doubleValue += 0.5;
+    }
 }
 
 - (void)setupDeterminateProgressTimer {
     [self disposeDeterminateProgressTimer];
     
     _determinateProgressTimer = [[NSTimer alloc] initWithFireDate:[NSDate date] 
-                                                         interval:0.05f 
+                                                         interval:0.05
                                                            target:self 
                                                          selector:@selector(advanceDeterminateTimer:) 
                                                          userInfo:nil 
