@@ -54,34 +54,48 @@
 
 - (IBAction)selectProgressIndicatorType:(id)sender
 {
-    BOOL wasRunning = NO;
-    
     if ([[sender selectedCell] tag] == 1) {
-        if (_determinateProgressTimer != nil) {
-            [self disposeDeterminateProgressTimer];
-            wasRunning = YES;
-        }
-        
-        _mainView.progressIndicatorLayer.isDeterminate = NO;
-        
-        if (wasRunning) {
-            [self startProgressIndicator:sender];
-        }
+        [self selectIndeterminateProgressIndicator:sender];
     }
     else if ([[sender selectedCell] tag] == 2) {
-        if (_mainView.progressIndicatorLayer.isRunning) {
-            [self stopProgressIndicator:sender];
-            wasRunning = YES;
-        }
-        
-        _mainView.progressIndicatorLayer.isDeterminate = YES;
-        
-        if (wasRunning) {
-            [self setupDeterminateProgressTimer];
-            [self startProgressIndicator:sender];
-        }
+        [self selectDeterminateProgressIndicator:sender];
     }
+}
 
+- (IBAction)selectIndeterminateProgressIndicator:(id)sender
+{
+    BOOL wasRunning = NO;
+    
+    if (_determinateProgressTimer != nil) {
+        [self disposeDeterminateProgressTimer];
+        wasRunning = YES;
+    }
+    
+    _mainView.progressIndicatorLayer.isDeterminate = NO;
+    
+    if (wasRunning) {
+        [self startProgressIndicator:sender];
+    }
+    
+    [_mainView setNeedsDisplay:YES];
+}
+
+- (IBAction)selectDeterminateProgressIndicator:(id)sender
+{
+    BOOL wasRunning = NO;
+    
+    if (_mainView.progressIndicatorLayer.isRunning) {
+        [self stopProgressIndicator:sender];
+        wasRunning = YES;
+    }
+    
+    _mainView.progressIndicatorLayer.isDeterminate = YES;
+    
+    if (wasRunning) {
+        [self setupDeterminateProgressTimer];
+        [self startProgressIndicator:sender];
+    }
+    
     [_mainView setNeedsDisplay:YES];
 }
 
