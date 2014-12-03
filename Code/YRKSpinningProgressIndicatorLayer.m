@@ -9,6 +9,7 @@
 
 
 #define TRADITIONAL_MODE    0
+#define TRADITIONAL_DETERMINATE   0
 
 #if !TRADITIONAL_MODE
 NSString * const RotationAnimationKey = @"rotationAnimation";
@@ -20,6 +21,12 @@ typedef struct _YRKFinGeometry {
     CGPoint position;
     CGFloat cornerRadius;
 } YRKFinGeometry;
+
+typedef struct _YRKPieGeometry {
+    CGRect bounds;
+    CGFloat outerEdgeLength;
+    CGFloat outlineWidth;
+} YRKPieGeometry;
 
 @interface YRKSpinningProgressIndicatorLayer ()
 
@@ -55,6 +62,12 @@ typedef struct _YRKFinGeometry {
 #endif
     
     double _doubleValue;
+    
+#if !TRADITIONAL_DETERMINATE
+    CALayer *_pieLayersRoot;
+    CAShapeLayer *_pieOutline;
+    CAShapeLayer *_pieChartShape;
+#endif
 }
 
 //------------------------------------------------------------------------------
@@ -90,6 +103,11 @@ typedef struct _YRKFinGeometry {
         self.maxValue = 100;
         
         [self createFinLayers];
+        
+#if !TRADITIONAL_DETERMINATE
+        _pieLayersRoot = [CALayer layer];
+        [self createDeterminateLayers];
+#endif
     }
     return self;
 }
@@ -127,6 +145,17 @@ typedef struct _YRKFinGeometry {
         fin.position = finGeo.position;
         fin.cornerRadius = finGeo.cornerRadius;
     }
+    
+#if !TRADITIONAL_DETERMINATE
+    // Scale pie.
+    YRKPieGeometry pieGeo = pieGeometryForBounds(self.bounds);
+    
+    _pieLayersRoot.bounds = pieGeo.bounds;
+    _pieLayersRoot.position = yrkCGRectGetCenter(pieGeo.bounds);
+    
+    updatePieOutlineDimensionsForGeometry(_pieOutline, pieGeo);
+    updatePieChartDimensionsForGeometry(_pieChartShape, pieGeo);
+#endif
     
     [CATransaction commit];
 }
@@ -214,6 +243,7 @@ typedef struct _YRKFinGeometry {
 #pragma mark Determinate indicator drawing
 //------------------------------------------------------------------------------
 
+#if TRADITIONAL_DETERMINATE
 - (void)drawInContext:(CGContextRef)ctx
 {
     CGContextClearRect(ctx, self.bounds);
@@ -249,6 +279,7 @@ typedef struct _YRKFinGeometry {
         CGContextFillPath(ctx);
     }
 }
+#endif
 
 //------------------------------------------------------------------------------
 #pragma mark -
@@ -277,6 +308,12 @@ typedef struct _YRKFinGeometry {
     for (CALayer *fin in _finLayers) {
         fin.backgroundColor = cgColor;
     }
+    
+#if !TRADITIONAL_DETERMINATE
+    _pieOutline.strokeColor = cgColor;
+    _pieChartShape.strokeColor = cgColor;
+#endif
+    
     [CATransaction commit];
 }
 
@@ -290,7 +327,11 @@ typedef struct _YRKFinGeometry {
 - (void)setIsDeterminate:(BOOL)determinate {
     _isDeterminate = determinate;
     [self setupType];
+#if TRADITIONAL_DETERMINATE
     [self setNeedsDisplay];
+#else
+    
+#endif
 }
 
 - (double)doubleValue {
@@ -299,7 +340,11 @@ typedef struct _YRKFinGeometry {
 
 - (void)setDoubleValue:(double)doubleValue {
     _doubleValue = doubleValue;
+#if TRADITIONAL_DETERMINATE
     [self setNeedsDisplay];
+#else
+    _pieChartShape.strokeEnd = doubleValue/_maxValue;
+#endif
 }
 
 - (void)toggleProgressAnimation
@@ -326,6 +371,11 @@ typedef struct _YRKFinGeometry {
 }
 
 - (void)setupIndeterminate {
+#if !TRADITIONAL_DETERMINATE
+    [_pieLayersRoot removeFromSuperlayer];
+    [self addSublayer:_finLayersRoot];
+#endif
+
 #if TRADITIONAL_MODE
     if (_isRunning) {
         [self setupAnimTimer];
@@ -340,6 +390,12 @@ typedef struct _YRKFinGeometry {
     }
 #endif
     [self stopProgressAnimation];
+    
+#if !TRADITIONAL_DETERMINATE
+    [_finLayersRoot removeFromSuperlayer];
+    [self addSublayer:_pieLayersRoot];
+#endif
+
 }
 
 - (void)createFinLayers
@@ -452,6 +508,168 @@ typedef struct _YRKFinGeometry {
     }
     [_finLayers removeAllObjects];
 }
+
+#if !TRADITIONAL_DETERMINATE
+const CGFloat OutlineWidthPercentage = 0.01;
+const CGFloat DeterminateLayersMarginPercentage = 0.98; // Selected to look good with current indeterminate settings.
+
+static YRKPieGeometry pieGeometryForBounds(CGRect bounds){
+    YRKPieGeometry pieGeo;
+    
+    // Make sure the circles will fit the frame.
+    pieGeo.outerEdgeLength = shorterDimensionForSize(bounds.size);
+    pieGeo.outerEdgeLength *= DeterminateLayersMarginPercentage;
+    
+    CGFloat xInset = (CGRectGetWidth(bounds) - pieGeo.outerEdgeLength) / 2;
+    CGFloat yInset = (CGRectGetHeight(bounds) - pieGeo.outerEdgeLength) / 2;
+    pieGeo.bounds = CGRectInset(bounds, xInset, yInset);
+    
+    pieGeo.outlineWidth = pieGeo.outerEdgeLength * OutlineWidthPercentage; // This used to be rounded.
+    
+    return pieGeo;
+}
+
+static void updatePieOutlineDimensionsForGeometry(CAShapeLayer *outlineShape, YRKPieGeometry pieGeo) {
+    CGFloat outlineInset = pieGeo.outlineWidth / 2;
+    CGRect outlineRect = CGRectInset(pieGeo.bounds, outlineInset, outlineInset);
+    
+    CGAffineTransform outlineTransform = CGAffineTransformForRotatingRectAroundCenter(outlineRect, degreesToRadians(90.0));
+    CGAffineTransform outlineFlip = CGAffineTransformForScalingRectAroundCenter(outlineRect, -1.0, 1.0); // Flip left<->right.
+    outlineTransform = CGAffineTransformConcat(outlineTransform, outlineFlip);
+    
+    CGPathRef outlinePath = CGPathCreateWithEllipseInRect(outlineRect, &outlineTransform);
+    outlineShape.path = outlinePath;
+    CGPathRelease(outlinePath);
+    
+    outlineShape.lineWidth = pieGeo.outlineWidth;
+}
+
+static void updatePieChartDimensionsForGeometry(CAShapeLayer *pieChartShape, YRKPieGeometry pieGeo) {
+    const CGFloat outerRadius = pieGeo.outerEdgeLength / 2;
+    
+    const CGFloat pieChartInset = outerRadius / 2 + pieGeo.outlineWidth;
+    CGRect pieChartRect = CGRectInset(pieGeo.bounds, pieChartInset, pieChartInset);
+    
+    CGAffineTransform pieChartTransform = CGAffineTransformForRotatingRectAroundCenter(pieChartRect, degreesToRadians(90.0));
+    CGAffineTransform pieChartFlip = CGAffineTransformForScalingRectAroundCenter(pieChartRect, -1.0, 1.0); // Flip left<->right.
+    pieChartTransform = CGAffineTransformConcat(pieChartTransform, pieChartFlip);
+    
+    CGPathRef pieChartPath = CGPathCreateWithEllipseInRect(pieChartRect, &pieChartTransform);
+    pieChartShape.path = pieChartPath;
+    CGPathRelease(pieChartPath);
+    
+    pieChartShape.lineWidth = (outerRadius - pieChartInset) * 2;
+}
+
+- (void)createDeterminateLayers
+{
+    [self removeDeterminateLayers];
+    
+    // Based on DRPieChartProgressView by David Rönnqvist:
+    // https://github.com/JanX2/cocoaheads-coreanimation-samplecode
+    
+    YRKPieGeometry pieGeo = pieGeometryForBounds(self.bounds);
+    
+    _pieLayersRoot.bounds = pieGeo.bounds;
+    _pieLayersRoot.position = yrkCGRectGetCenter(pieGeo.bounds);
+    
+    // Create new determinate layers.
+    
+    [CATransaction begin];
+    [CATransaction setValue:@YES forKey:kCATransactionDisableActions];
+    
+    CGColorRef foregroundColor = _foreColor;
+    CGColorRef clearColor = [[NSColor clearColor] CGColor];
+    
+    // Calculate the radius for the outline. Since strokes are centered,
+    // the shape needs to be inset half the stroke width.
+    _pieOutline = [CAShapeLayer layer];
+    updatePieOutlineDimensionsForGeometry(_pieOutline, pieGeo);
+    
+    // Draw only the line of the circular outline shape.
+    _pieOutline.fillColor =    clearColor;
+    _pieOutline.strokeColor =  foregroundColor;
+    
+    // Create the pie chart shape layer. It should fill from the center,
+    // all the way out (excluding some extra space (equal to the width of
+    // the outline)).
+    _pieChartShape = [CAShapeLayer layer];
+    updatePieChartDimensionsForGeometry(_pieChartShape, pieGeo);
+    
+    // We don't want to fill the pie chart since that will be visible
+    // even when we change the stroke start and stroke end. Instead
+    // we only draw the stroke with the width calculated above.
+    _pieChartShape.fillColor =     clearColor;
+    _pieChartShape.strokeColor =   foregroundColor;
+    
+    // Add sublayers.
+    [_pieLayersRoot addSublayer:_pieOutline];
+    [_pieLayersRoot addSublayer:_pieChartShape];
+    
+    _pieChartShape.strokeStart = 0.0;
+    _pieChartShape.strokeEnd = 0.0;
+    
+    // This controls the transition from one doubleValue to the next.
+#define ACTION_TYPE 10
+    id <CAAction> pieProgressAction = nil;
+#if (ACTION_TYPE == 0)
+    pieProgressAction = (id <CAAction>)[NSNull null]; // Disable transition: hard jump.
+#elif (ACTION_TYPE == 1)
+    // Fade new pie slices in.
+    CATransition *pieProgressTransition = nil;
+    pieProgressTransition = [[CATransition alloc] init];
+    pieProgressTransition.duration = 1.0;
+    pieProgressTransition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut];
+    pieProgressTransition.type = kCATransitionPush;
+    pieProgressTransition.subtype = kCATransitionFromRight;
+    pieProgressAction = pieProgressTransition;
+#elif (ACTION_TYPE == 2)
+    // Smooth animation to new value. May cause artefacts.
+    CABasicAnimation *pieProgressAnimation = [CABasicAnimation
+                                              animationWithKeyPath:@"strokeEnd"];
+    pieProgressAnimation.duration = 0.05; // This value can help smooth over sparse doubleValue changes.
+    pieProgressAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut];
+    pieProgressAction = pieProgressAnimation;
+#endif
+    if (pieProgressAction != nil) {
+        _pieChartShape.actions = @{@"strokeEnd": pieProgressAction};
+    }
+    
+    [CATransaction commit];
+}
+
+- (void)removeDeterminateLayers
+{
+    for (CALayer *pieLayer in _pieLayersRoot.sublayers) {
+        [pieLayer removeFromSuperlayer];
+    }
+}
+
+static inline CGFloat degreesToRadians(CGFloat degrees) {
+    return degrees * M_PI / 180.0;
+}
+
+static CGAffineTransform CGAffineTransformForRotatingRectAroundCenter(CGRect rect, CGFloat angle) {
+    CGAffineTransform transform = CGAffineTransformIdentity;
+    
+    transform = CGAffineTransformTranslate(transform, CGRectGetMidX(rect), CGRectGetMidY(rect));
+    transform = CGAffineTransformRotate(transform, angle);
+    transform = CGAffineTransformTranslate(transform, -CGRectGetMidX(rect), -CGRectGetMidY(rect));
+    
+    return transform;
+}
+
+static CGAffineTransform CGAffineTransformForScalingRectAroundCenter(CGRect rect, CGFloat sx, CGFloat sy) {
+	CGAffineTransform transform = CGAffineTransformIdentity;
+	
+	transform = CGAffineTransformTranslate(transform, CGRectGetMidX(rect), CGRectGetMidY(rect));
+	transform = CGAffineTransformScale(transform, sx, sy);
+	transform = CGAffineTransformTranslate(transform, -CGRectGetMidX(rect), -CGRectGetMidY(rect));
+	
+	return transform;
+}
+#endif
+
 
 static YRKFinGeometry finGeometryForBounds(CGRect bounds) {
     YRKFinGeometry finGeometry;
