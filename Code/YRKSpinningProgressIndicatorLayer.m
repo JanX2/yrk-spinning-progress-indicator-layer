@@ -339,7 +339,7 @@ typedef struct _YRKFinGeometry {
         [self disposeAnimTimer];
     }
 #endif
-    [self removeFinLayers];
+    [self stopProgressAnimation];
 }
 
 - (void)createFinLayers
