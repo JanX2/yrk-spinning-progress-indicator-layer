@@ -165,7 +165,13 @@ const NSUInteger finalWait = 40;
     }
     else {
         if (_initialWaitTicks >= initialWait) {
+#define ENABLE_CLOCK_STYLE 1
+#if ENABLE_CLOCK_STYLE
+            _mainView.progressIndicatorLayer.doubleValue += 5;
+            _initialWaitTicks = 0;
+#else
             _mainView.progressIndicatorLayer.doubleValue += 0.5;
+#endif
         }
         _initialWaitTicks++;
     }
