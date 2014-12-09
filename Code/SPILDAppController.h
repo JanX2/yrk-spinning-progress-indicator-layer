@@ -8,7 +8,6 @@
 #import <Cocoa/Cocoa.h>
 
 @class SPILDTopLayerView;
-@class SpinningProgressIndicatorLayer;
 
 
 @interface SPILDAppController : NSObject {
