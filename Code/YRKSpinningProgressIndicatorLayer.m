@@ -8,11 +8,13 @@
 #import "YRKSpinningProgressIndicatorLayer.h"
 
 
-#define TRADITIONAL_INDETERMINATE   0
-#define TRADITIONAL_DETERMINATE     0
+#define TRADITIONAL_INDETERMINATE       0
+#define TRADITIONAL_DETERMINATE         0
+#define INDETERMINATE_FADE_ANIMATION    1
 
 #if !TRADITIONAL_INDETERMINATE
 NSString * const RotationAnimationKey = @"rotationAnimation";
+NSString * const FadeAnimationKey = @"opacity";
 #endif
 
 typedef struct _YRKFinGeometry {
@@ -485,6 +487,32 @@ typedef struct _YRKPieGeometry {
         [finLayer setActions:actions];
     }
 #else
+#   if INDETERMINATE_FADE_ANIMATION
+    NSUInteger i = 0;
+    NSNumber *fullOpacityNum = @(_fullOpacity);
+    NSNumber *fadeDownOpacityNum = @(_fadeDownOpacity);
+    for (CALayer *finLayer in _finLayers) {
+        CFTimeInterval now = [finLayer convertTime:CACurrentMediaTime()
+                                         fromLayer:nil];
+        
+        finLayer.opacity = _fadeDownOpacity;
+        CABasicAnimation *fadeOut = [CABasicAnimation animationWithKeyPath:FadeAnimationKey];
+        
+        fadeOut.fromValue = fullOpacityNum;
+        fadeOut.toValue = fadeDownOpacityNum;
+        
+        fadeOut.duration = _indeterminateCycleDuration;
+        CFTimeInterval timeOffset = _indeterminateCycleDuration - (_indeterminateCycleDuration * (CFTimeInterval)i/(_numFins-1));
+        fadeOut.beginTime = now - timeOffset;
+        fadeOut.fillMode = kCAFillModeBackwards;
+        fadeOut.repeatCount = HUGE_VALF;
+        
+        [finLayer addAnimation:fadeOut
+                        forKey:FadeAnimationKey];
+        
+        i++;
+    }
+#   else
     CAKeyframeAnimation *animation;
     animation = [CAKeyframeAnimation animationWithKeyPath:@"transform.rotation.z"];
     animation.duration = _indeterminateCycleDuration;
@@ -496,6 +524,7 @@ typedef struct _YRKPieGeometry {
     
     [_finLayersRoot addAnimation:animation
                           forKey:RotationAnimationKey];
+#   endif
 #endif
     
     [CATransaction commit];
@@ -511,7 +540,13 @@ typedef struct _YRKPieGeometry {
         [finLayer setActions:nil];
     }
 #else
+#   if INDETERMINATE_FADE_ANIMATION
+    for (CALayer *finLayer in _finLayers) {
+        [finLayer removeAnimationForKey:FadeAnimationKey];
+    }
+#   else
     [_finLayersRoot removeAnimationForKey:RotationAnimationKey];
+#   endif
 #endif
     
     [CATransaction commit];
