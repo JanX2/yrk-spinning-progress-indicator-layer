@@ -449,10 +449,7 @@ typedef struct _YRKPieGeometry {
 #else
         [_finLayerRotationValues addObject:@(rotationAngle)];
 
-        // Set the fin’s opacity.
-        CGFloat fadePercent = 1.0 - (CGFloat)i/(_numFins-1);
-        CGFloat opacity = _fadeDownOpacity + ((_fullOpacity - _fadeDownOpacity) * fadePercent);
-        newFin.opacity = opacity;
+        newFin.opacity = [self initialOpacityForFinAtIndex:i];
 #endif
 
         [_finLayersRoot addSublayer:newFin];
@@ -460,6 +457,13 @@ typedef struct _YRKPieGeometry {
     }
 
     [CATransaction commit];
+}
+
+- (CGFloat)initialOpacityForFinAtIndex:(NSUInteger)i
+{
+    CGFloat fadePercent = 1.0 - (CGFloat)i/(_numFins-1);
+    CGFloat opacity = _fadeDownOpacity + ((_fullOpacity - _fadeDownOpacity) * fadePercent);
+    return opacity;
 }
 
 - (void)animateFinLayers
