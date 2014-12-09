@@ -21,6 +21,9 @@
     NSUInteger _numFins;
 }
 
+- (instancetype)initWithIndeterminateCycleDuration:(CFTimeInterval)indeterminateCycleDuration
+                              determinateTweenTime:(CFTimeInterval)determinateTweenTime;
+
 - (void)toggleProgressAnimation;
 - (void)startProgressAnimation;
 - (void)stopProgressAnimation;

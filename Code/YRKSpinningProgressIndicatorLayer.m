@@ -79,9 +79,16 @@ typedef struct _YRKPieGeometry {
 
 - (instancetype)init
 {
+    return [self initWithIndeterminateCycleDuration:0.7
+                               determinateTweenTime:NAN]; // Use Core Animation default.
+}
+
+- (instancetype)initWithIndeterminateCycleDuration:(CFTimeInterval)indeterminateCycleDuration
+                              determinateTweenTime:(CFTimeInterval)determinateTweenTime
+{
     self = [super init];
     if (self) {
-        _indeterminateCycleDuration = 0.7;
+        _indeterminateCycleDuration = indeterminateCycleDuration;
         
         _position = 0;
         _numFins = 12;
@@ -101,7 +108,7 @@ typedef struct _YRKPieGeometry {
         self.color = [NSColor blackColor];
         [self setBounds:CGRectMake(0.0f, 0.0f, 10.0f, 10.0f)];
         self.isDeterminate = NO;
-        _determinateTweenTime = NAN; // Use Core Animation default.
+        _determinateTweenTime = determinateTweenTime;
         self.maxValue = 100.0;
         self.doubleValue = 0.0;
         
