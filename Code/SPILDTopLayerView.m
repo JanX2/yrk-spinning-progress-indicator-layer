@@ -66,7 +66,8 @@
     [self usePlainBackground];
 
     // Put a SpinningProgressIndicatorLayer in front of everything
-    _progressIndicatorLayer = [[YRKSpinningProgressIndicatorLayer alloc] init];
+    _progressIndicatorLayer = [[YRKSpinningProgressIndicatorLayer alloc] initWithIndeterminateCycleDuration:2.0 // This is the value that Screen Sharing uses.
+                                                                                       determinateTweenTime:NAN];
     _progressIndicatorLayer.name = @"progressIndicatorLayer";
     _progressIndicatorLayer.anchorPoint = CGPointMake(0.0, 0.0);
     _progressIndicatorLayer.position = CGPointMake(0, 0);
