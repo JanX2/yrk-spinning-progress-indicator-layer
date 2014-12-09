@@ -568,7 +568,10 @@ typedef struct _YRKPieGeometry {
 }
 
 #if !TRADITIONAL_DETERMINATE
+// These are proportional to the size of the drawn determinate progress indicator.
 const CGFloat OutlineWidthPercentage = 0.01;
+const CGFloat PieChartPaddingPercentage = OutlineWidthPercentage/2; // The padding around the pie chart.
+
 const CGFloat DeterminateLayersMarginPercentage = 0.98; // Selected to look good with current indeterminate settings.
 
 static YRKPieGeometry pieGeometryForBounds(CGRect bounds){
@@ -605,9 +608,17 @@ static void updatePieOutlineDimensionsForGeometry(CAShapeLayer *outlineShape, YR
 static void updatePieChartDimensionsForGeometry(CAShapeLayer *pieChartShape, YRKPieGeometry pieGeo) {
     const CGFloat outerRadius = pieGeo.outerEdgeLength / 2;
     
-    const CGFloat pieChartInset = outerRadius / 2 + pieGeo.outlineWidth;
-    CGRect pieChartRect = CGRectInset(pieGeo.bounds, pieChartInset, pieChartInset);
-    
+    // The pie chart is drawn using a circular line
+    // with a line width equal to twice the radius.
+    // So we draw from every point on this line, which you can picture as a centerline,
+    // radius units towards and away from the center, reaching the center exactly.
+    // This way, we get a full circle, if the full length of the line is draw.
+    const CGFloat pieChartExtraInset = (pieGeo.outerEdgeLength * PieChartPaddingPercentage);
+    const CGFloat pieChartInset = (outerRadius + pieGeo.outlineWidth + pieChartExtraInset) / 2;
+    const CGFloat pieChartCenterlineRadius = outerRadius - pieChartInset;
+    const CGFloat pieChartOutlineRadius = pieChartCenterlineRadius * 2;
+    const CGRect pieChartRect = CGRectInset(pieGeo.bounds, pieChartInset, pieChartInset);
+
     CGAffineTransform pieChartTransform = CGAffineTransformForRotatingRectAroundCenter(pieChartRect, degreesToRadians(90.0));
     CGAffineTransform pieChartFlip = CGAffineTransformForScalingRectAroundCenter(pieChartRect, -1.0, 1.0); // Flip left<->right.
     pieChartTransform = CGAffineTransformConcat(pieChartTransform, pieChartFlip);
@@ -616,7 +627,7 @@ static void updatePieChartDimensionsForGeometry(CAShapeLayer *pieChartShape, YRK
     pieChartShape.path = pieChartPath;
     CGPathRelease(pieChartPath);
     
-    pieChartShape.lineWidth = (outerRadius - pieChartInset) * 2;
+    pieChartShape.lineWidth = pieChartOutlineRadius;
 }
 
 - (void)createDeterminateLayers
