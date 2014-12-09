@@ -12,8 +12,8 @@
 @class YRKSpinningProgressIndicatorLayer;
 
 
-// the MenuView class is the view subclass that is inserted into
-// the window.  It hosts the rootLayer, and responds to events
+// The MenuView class is the view subclass that is inserted into
+// the window.  It hosts the rootLayer, and responds to events.
 @interface SPILDTopLayerView : NSView {
     CALayer *__weak _rootLayer;
     CALayer *_plainBackgroundLayer;
