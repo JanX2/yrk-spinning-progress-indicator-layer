@@ -100,7 +100,8 @@ typedef struct _YRKPieGeometry {
         [self setBounds:CGRectMake(0.0f, 0.0f, 10.0f, 10.0f)];
         self.isDeterminate = NO;
         self.doubleValue = 0;
-        self.maxValue = 100;
+        self.maxValue = 100.0;
+        self.doubleValue = 0.0;
         
         [self createFinLayers];
         
