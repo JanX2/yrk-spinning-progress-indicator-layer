@@ -99,7 +99,7 @@ typedef struct _YRKPieGeometry {
         self.color = [NSColor blackColor];
         [self setBounds:CGRectMake(0.0f, 0.0f, 10.0f, 10.0f)];
         self.isDeterminate = NO;
-        self.doubleValue = 0;
+        _determinateTweenTime = NAN; // Use Core Animation default.
         self.maxValue = 100.0;
         self.doubleValue = 0.0;
         
@@ -344,7 +344,18 @@ typedef struct _YRKPieGeometry {
 #if TRADITIONAL_DETERMINATE
     [self setNeedsDisplay];
 #else
+    if (!isnan(_determinateTweenTime)) {
+        [CATransaction begin];
+        
+        // This controls the transition from one doubleValue to the next.
+        [CATransaction setAnimationDuration:_determinateTweenTime];
+    }
+    
     _pieChartShape.strokeEnd = doubleValue/_maxValue;
+    
+    if (!isnan(_determinateTweenTime)) {
+        [CATransaction commit];
+    }
 #endif
 }
 
@@ -609,32 +620,6 @@ static void updatePieChartDimensionsForGeometry(CAShapeLayer *pieChartShape, YRK
     
     _pieChartShape.strokeStart = 0.0;
     _pieChartShape.strokeEnd = 0.0;
-    
-    // This controls the transition from one doubleValue to the next.
-#define ACTION_TYPE 10
-    id <CAAction> pieProgressAction = nil;
-#if (ACTION_TYPE == 0)
-    pieProgressAction = (id <CAAction>)[NSNull null]; // Disable transition: hard jump.
-#elif (ACTION_TYPE == 1)
-    // Fade new pie slices in.
-    CATransition *pieProgressTransition = nil;
-    pieProgressTransition = [[CATransition alloc] init];
-    pieProgressTransition.duration = 1.0;
-    pieProgressTransition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut];
-    pieProgressTransition.type = kCATransitionPush;
-    pieProgressTransition.subtype = kCATransitionFromRight;
-    pieProgressAction = pieProgressTransition;
-#elif (ACTION_TYPE == 2)
-    // Smooth animation to new value. May cause artefacts.
-    CABasicAnimation *pieProgressAnimation = [CABasicAnimation
-                                              animationWithKeyPath:@"strokeEnd"];
-    pieProgressAnimation.duration = 0.05; // This value can help smooth over sparse doubleValue changes.
-    pieProgressAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut];
-    pieProgressAction = pieProgressAnimation;
-#endif
-    if (pieProgressAction != nil) {
-        _pieChartShape.actions = @{@"strokeEnd": pieProgressAction};
-    }
     
     [CATransaction commit];
 }
