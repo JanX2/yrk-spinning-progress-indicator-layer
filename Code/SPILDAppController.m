@@ -135,7 +135,7 @@
 {
     if (_mainView.progressIndicatorLayer.isDeterminate) {
         [self disposeDeterminateProgressTimer];
-        _mainView.progressIndicatorLayer.doubleValue = 0.0;
+        //_mainView.progressIndicatorLayer.doubleValue = 0.0;
     }
     else {
         [[_mainView progressIndicatorLayer] stopProgressAnimation];
@@ -164,7 +164,8 @@ const NSUInteger finalWait = 40;
         _finalWaitTicks--;
     }
     else {
-        if (_initialWaitTicks >= initialWait) {
+        if ((_initialWaitTicks >= initialWait) ||
+            (_mainView.progressIndicatorLayer.doubleValue > 0.0)) {
 #define ENABLE_CLOCK_STYLE 0
 #if ENABLE_CLOCK_STYLE
             _mainView.progressIndicatorLayer.doubleValue += 5;
