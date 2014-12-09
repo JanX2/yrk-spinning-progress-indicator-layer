@@ -569,7 +569,7 @@ typedef struct _YRKPieGeometry {
 
 #if !TRADITIONAL_DETERMINATE
 // These are proportional to the size of the drawn determinate progress indicator.
-const CGFloat OutlineWidthPercentage = 0.01;
+const CGFloat OutlineWidthPercentage = 1.0/16;
 const CGFloat PieChartPaddingPercentage = OutlineWidthPercentage/2; // The padding around the pie chart.
 
 const CGFloat DeterminateLayersMarginPercentage = 0.98; // Selected to look good with current indeterminate settings.
