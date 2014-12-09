@@ -129,17 +129,17 @@ typedef struct _YRKPieGeometry {
 {
     [super setBounds:newBounds];
 
+    // Do the resizing all at once, immediately.
     [CATransaction begin];
     [CATransaction setValue:@YES forKey:kCATransactionDisableActions];
     
-    // Resize the fins
+    // Resize the fins.
     const CGRect bounds = newBounds;
     YRKFinGeometry finGeo = finGeometryForBounds(bounds);
 
     _finLayersRoot.bounds = bounds;
     _finLayersRoot.position = yrkCGRectGetCenter(bounds);
     
-    // do the resizing all at once, immediately
     for (CALayer *fin in _finLayers) {
         fin.bounds = finGeo.bounds;
         fin.anchorPoint = finGeo.anchorPoint;
