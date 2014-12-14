@@ -8,14 +8,11 @@
 #import "YRKSpinningProgressIndicatorLayer.h"
 
 
-#define TRADITIONAL_INDETERMINATE       0
 #define TRADITIONAL_DETERMINATE         0
 #define INDETERMINATE_FADE_ANIMATION    1
 
-#if !TRADITIONAL_INDETERMINATE
 NSString * const RotationAnimationKey = @"rotationAnimation";
 NSString * const FadeAnimationKey = @"opacity";
-#endif
 
 typedef struct _YRKFinGeometry {
     CGRect bounds;
@@ -32,11 +29,6 @@ typedef struct _YRKPieGeometry {
 
 @interface YRKSpinningProgressIndicatorLayer ()
 
-#if TRADITIONAL_INDETERMINATE
-// Animation
-- (void)advancePosition;
-#endif
-
 // Helper Methods
 - (void)setupType;
 - (void)setupIndeterminate;
@@ -44,11 +36,6 @@ typedef struct _YRKPieGeometry {
 
 - (void)removeFinLayers;
 - (void)createFinLayers;
-
-#if TRADITIONAL_INDETERMINATE
-- (void)setupAnimTimer;
-- (void)disposeAnimTimer;
-#endif
 
 @end
 
@@ -59,9 +46,7 @@ typedef struct _YRKPieGeometry {
     
     CALayer *_finLayersRoot;
     NSMutableArray *_finLayers;
-#if !TRADITIONAL_INDETERMINATE
     NSMutableArray *_finLayerRotationValues;
-#endif
     
     double _doubleValue;
     
@@ -98,9 +83,7 @@ typedef struct _YRKPieGeometry {
         //_finLayersRoot.anchorPoint = CGPointMake(0.5, 0.5); // This is the default.
         [self addSublayer:_finLayersRoot];
 
-#if !TRADITIONAL_INDETERMINATE
         _finLayerRotationValues = [NSMutableArray array];
-#endif
         
         _fullOpacity = 1.0f;
         _indeterminateMinimumOpacity = 0.05f;
@@ -176,59 +159,10 @@ typedef struct _YRKPieGeometry {
 #pragma mark Animation
 //------------------------------------------------------------------------------
 
-#if TRADITIONAL_INDETERMINATE
-- (void)advancePosition
-{
-    _position++;
-    if (_position >= _numFins) {
-        _position = 0;
-    }
-    
-    CALayer *fin = (_finLayers.count > 0) ? (CALayer *)_finLayers[_position] : nil;
-
-    // Set the next fin to full opacity, but do it immediately, without any animation
-    [CATransaction begin];
-    [CATransaction setValue:@YES forKey:kCATransactionDisableActions];
-    fin.opacity = _fullOpacity;
-    [CATransaction commit];
-
-    // Tell that fin to animate its opacity to transparent.
-    fin.opacity = _fadeDownOpacity;
-}
-
-- (void)setupAnimTimer
-{
-    // Just to be safe kill any existing timer.
-    [self disposeAnimTimer];
-
-    // Why animate if not visible?  viewDidMoveToWindow will re-call this method when needed.
-    _animationTimer = [NSTimer timerWithTimeInterval:(NSTimeInterval)0.05
-                                               target:self
-                                             selector:@selector(advancePosition)
-                                             userInfo:nil
-                                              repeats:YES];
-
-    [_animationTimer setFireDate:[NSDate date]];
-    [[NSRunLoop currentRunLoop] addTimer:_animationTimer forMode:NSRunLoopCommonModes];
-    [[NSRunLoop currentRunLoop] addTimer:_animationTimer forMode:NSDefaultRunLoopMode];
-    [[NSRunLoop currentRunLoop] addTimer:_animationTimer forMode:NSEventTrackingRunLoopMode];
-}
-
-- (void)disposeAnimTimer
-{
-    [_animationTimer invalidate];
-    _animationTimer = nil;
-}
-#endif
-
 - (void)startProgressAnimation
 {
     _isRunning = YES;
     _position = _numFins - 1;
-    
-#if TRADITIONAL_INDETERMINATE
-    [self setupAnimTimer];
-#endif
     
     [self addSublayer:_finLayersRoot];
     
@@ -241,10 +175,6 @@ typedef struct _YRKPieGeometry {
 
     [self deanimateFinLayers];
     
-#if TRADITIONAL_INDETERMINATE
-    [self disposeAnimTimer];
-#endif
-
     [_finLayersRoot removeFromSuperlayer];
 }
 
@@ -397,19 +327,9 @@ typedef struct _YRKPieGeometry {
     [self addSublayer:_finLayersRoot];
 #endif
 
-#if TRADITIONAL_INDETERMINATE
-    if (_isRunning) {
-        [self setupAnimTimer];
-    }
-#endif
 }
 
 - (void)setupDeterminate {
-#if TRADITIONAL_INDETERMINATE
-    if (_isRunning) {
-        [self disposeAnimTimer];
-    }
-#endif
     [self stopProgressAnimation];
     
 #if !TRADITIONAL_DETERMINATE
@@ -436,9 +356,7 @@ typedef struct _YRKPieGeometry {
     
     CGFloat rotationAngleBetweenFins = -2 * M_PI/_numFins;
     
-#if !TRADITIONAL_INDETERMINATE
     [_finLayerRotationValues removeAllObjects];
-#endif
     
     for (NSUInteger i = 0; i < _numFins; i++) {
         CALayer *newFin = [CALayer layer];
@@ -452,15 +370,10 @@ typedef struct _YRKPieGeometry {
         newFin.cornerRadius = finGeo.cornerRadius;
         newFin.backgroundColor = _foreColor;
 
-#if TRADITIONAL_INDETERMINATE
-        // Set the fin's initial opacity
-        newFin.opacity = _fadeDownOpacity;
-#else
         [_finLayerRotationValues addObject:@(rotationAngle)];
 
         newFin.opacity = [self initialOpacityForFinAtIndex:i];
-#endif
-
+        
         [_finLayersRoot addSublayer:newFin];
         [_finLayers addObject:newFin];
     }
@@ -482,18 +395,6 @@ typedef struct _YRKPieGeometry {
     
     [self deanimateFinLayers];
     
-#if TRADITIONAL_INDETERMINATE
-    for (CALayer *finLayer in _finLayers) {
-        // Set the fin’s initial opacity.
-        finLayer.opacity = _fadeDownOpacity;
-        
-        // set the fin's fade-out time (for when it's animating)
-        CABasicAnimation *animation = [CABasicAnimation animation];
-        animation.duration = _indeterminateCycleDuration;
-        NSDictionary *actions = @{@"opacity": animation};
-        [finLayer setActions:actions];
-    }
-#else
 #   if INDETERMINATE_FADE_ANIMATION
     NSUInteger i = 0;
     NSNumber *fullOpacityNum = @(_fullOpacity);
@@ -532,7 +433,6 @@ typedef struct _YRKPieGeometry {
     [_finLayersRoot addAnimation:animation
                           forKey:RotationAnimationKey];
 #   endif
-#endif
     
     [CATransaction commit];
 }
@@ -542,11 +442,6 @@ typedef struct _YRKPieGeometry {
     [CATransaction begin];
     [CATransaction setValue:@YES forKey:kCATransactionDisableActions];
     
-#if TRADITIONAL_INDETERMINATE
-    for (CALayer *finLayer in _finLayers) {
-        [finLayer setActions:nil];
-    }
-#else
 #   if INDETERMINATE_FADE_ANIMATION
     for (CALayer *finLayer in _finLayers) {
         [finLayer removeAnimationForKey:FadeAnimationKey];
@@ -554,7 +449,6 @@ typedef struct _YRKPieGeometry {
 #   else
     [_finLayersRoot removeAnimationForKey:RotationAnimationKey];
 #   endif
-#endif
     
     [CATransaction commit];
 }
