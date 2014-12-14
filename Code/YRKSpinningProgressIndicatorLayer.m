@@ -103,7 +103,7 @@ typedef struct _YRKPieGeometry {
 #endif
         
         _fullOpacity = 1.0f;
-        _fadeDownOpacity = 0.05f;
+        _indeterminateMinimumOpacity = 0.05f;
         _isRunning = NO;
         self.color = [NSColor blackColor];
         [self setBounds:CGRectMake(0.0f, 0.0f, 10.0f, 10.0f)];
@@ -471,7 +471,7 @@ typedef struct _YRKPieGeometry {
 - (CGFloat)initialOpacityForFinAtIndex:(NSUInteger)i
 {
     CGFloat fadePercent = 1.0 - (CGFloat)i/(_numFins-1);
-    float opacity = _fadeDownOpacity + ((_fullOpacity - _fadeDownOpacity) * fadePercent);
+    float opacity = _indeterminateMinimumOpacity + ((_fullOpacity - _indeterminateMinimumOpacity) * fadePercent);
     return opacity;
 }
 
@@ -497,12 +497,12 @@ typedef struct _YRKPieGeometry {
 #   if INDETERMINATE_FADE_ANIMATION
     NSUInteger i = 0;
     NSNumber *fullOpacityNum = @(_fullOpacity);
-    NSNumber *fadeDownOpacityNum = @(_fadeDownOpacity);
+    NSNumber *fadeDownOpacityNum = @(_indeterminateMinimumOpacity);
     for (CALayer *finLayer in _finLayers) {
         CFTimeInterval now = [finLayer convertTime:CACurrentMediaTime()
                                          fromLayer:nil];
         
-        finLayer.opacity = _fadeDownOpacity;
+        finLayer.opacity = _indeterminateMinimumOpacity;
         CABasicAnimation *fadeOut = [CABasicAnimation animationWithKeyPath:FadeAnimationKey];
         
         fadeOut.fromValue = fullOpacityNum;

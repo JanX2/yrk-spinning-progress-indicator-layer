@@ -16,7 +16,7 @@
     
     CGColorRef _foreColor;
     float _fullOpacity;
-    float _fadeDownOpacity;
+    float _indeterminateMinimumOpacity;
 
     NSUInteger _numFins;
 }
