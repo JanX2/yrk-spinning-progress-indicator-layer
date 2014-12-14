@@ -40,9 +40,11 @@
     [_progressIndicatorType selectCell:[_progressIndicatorType cellWithTag:2]];
     [self selectDeterminateProgressIndicator:self];
 #endif
-    
-    _mainView.progressIndicatorLayer.determinateProgressOpacity = 0.70f;
 
+    YRKSpinningProgressIndicatorLayer *progressIndicatorLayer = _mainView.progressIndicatorLayer;
+
+    progressIndicatorLayer.determinateProgressOpacity = 0.70f;
+    
     [self startStopProgressIndicator:self];
 }
 
