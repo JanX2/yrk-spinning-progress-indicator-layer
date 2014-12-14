@@ -653,6 +653,7 @@ static void updatePieChartDimensionsForGeometry(CAShapeLayer *pieChartShape, YRK
     // Calculate the radius for the outline. Since strokes are centered,
     // the shape needs to be inset half the stroke width.
     _pieOutline = [CAShapeLayer layer];
+    _pieChartShape.opacity = _fullOpacity;
     updatePieOutlineDimensionsForGeometry(_pieOutline, pieGeo);
     
     // Draw only the line of the circular outline shape.
@@ -663,6 +664,7 @@ static void updatePieChartDimensionsForGeometry(CAShapeLayer *pieChartShape, YRK
     // all the way out (excluding some extra space (equal to the width of
     // the outline)).
     _pieChartShape = [CAShapeLayer layer];
+    _pieChartShape.opacity = _fullOpacity;
     updatePieChartDimensionsForGeometry(_pieChartShape, pieGeo);
     
     // We don't want to fill the pie chart since that will be visible
