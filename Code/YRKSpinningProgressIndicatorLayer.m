@@ -471,7 +471,7 @@ typedef struct _YRKPieGeometry {
 - (CGFloat)initialOpacityForFinAtIndex:(NSUInteger)i
 {
     CGFloat fadePercent = 1.0 - (CGFloat)i/(_numFins-1);
-    CGFloat opacity = _fadeDownOpacity + ((_fullOpacity - _fadeDownOpacity) * fadePercent);
+    float opacity = _fadeDownOpacity + ((_fullOpacity - _fadeDownOpacity) * fadePercent);
     return opacity;
 }
 

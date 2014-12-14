@@ -15,8 +15,8 @@
     NSTimeInterval _indeterminateCycleDuration;
     
     CGColorRef _foreColor;
-    CGFloat _fullOpacity;
-    CGFloat _fadeDownOpacity;
+    float _fullOpacity;
+    float _fadeDownOpacity;
 
     NSUInteger _numFins;
 }
