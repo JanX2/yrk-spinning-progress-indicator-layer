@@ -41,6 +41,8 @@
     [self selectDeterminateProgressIndicator:self];
 #endif
     
+    _mainView.progressIndicatorLayer.determinateProgressOpacity = 0.70f;
+
     [self startStopProgressIndicator:self];
 }
 

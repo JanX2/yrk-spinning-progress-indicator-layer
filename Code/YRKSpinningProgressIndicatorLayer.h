@@ -37,6 +37,7 @@
 @property (readwrite, assign) double maxValue;
 @property (readwrite, assign) double doubleValue;
 
+@property (readwrite, assign) float determinateProgressOpacity;
 @property (readwrite, assign) CFTimeInterval determinateTweenTime; // Smoothes animation to new doubleValue. 0.0: disable smooth transition, hard jump.
 
 @end

@@ -238,6 +238,14 @@ typedef struct _YRKPieGeometry {
     }
 }
 
+- (float)determinateProgressOpacity {
+    return _pieChartShape.opacity;
+}
+
+- (void)setDeterminateProgressOpacity:(float)newOpacity {
+    _pieChartShape.opacity = newOpacity;
+}
+
 - (void)toggleProgressAnimation
 {
     if (_isRunning) {
