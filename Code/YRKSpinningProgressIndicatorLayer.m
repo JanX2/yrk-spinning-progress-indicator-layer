@@ -8,7 +8,6 @@
 #import "YRKSpinningProgressIndicatorLayer.h"
 
 
-#define TRADITIONAL_DETERMINATE         0
 #define INDETERMINATE_FADE_ANIMATION    1
 
 NSString * const RotationAnimationKey = @"rotationAnimation";
@@ -50,11 +49,9 @@ typedef struct _YRKPieGeometry {
     
     double _doubleValue;
     
-#if !TRADITIONAL_DETERMINATE
     CALayer *_pieLayersRoot;
     CAShapeLayer *_pieOutline;
     CAShapeLayer *_pieChartShape;
-#endif
 }
 
 //------------------------------------------------------------------------------
@@ -97,10 +94,8 @@ typedef struct _YRKPieGeometry {
         
         [self createFinLayers];
         
-#if !TRADITIONAL_DETERMINATE
         _pieLayersRoot = [CALayer layer];
         [self createDeterminateLayers];
-#endif
     }
     return self;
 }
@@ -139,7 +134,6 @@ typedef struct _YRKPieGeometry {
         fin.cornerRadius = finGeo.cornerRadius;
     }
     
-#if !TRADITIONAL_DETERMINATE
     // Scale pie.
     YRKPieGeometry pieGeo = pieGeometryForBounds(self.bounds);
     
@@ -148,7 +142,6 @@ typedef struct _YRKPieGeometry {
     
     updatePieOutlineDimensionsForGeometry(_pieOutline, pieGeo);
     updatePieChartDimensionsForGeometry(_pieChartShape, pieGeo);
-#endif
     
     [CATransaction commit];
 }
@@ -180,49 +173,6 @@ typedef struct _YRKPieGeometry {
 
 //------------------------------------------------------------------------------
 #pragma mark -
-#pragma mark Determinate indicator drawing
-//------------------------------------------------------------------------------
-
-#if TRADITIONAL_DETERMINATE
-- (void)drawInContext:(CGContextRef)ctx
-{
-    CGContextClearRect(ctx, self.bounds);
-
-    if (!_isDeterminate) {
-        [super drawInContext:ctx];
-        return;
-    }
-
-    CGFloat maxSize = (self.bounds.size.width >= self.bounds.size.height) ? self.bounds.size.height : self.bounds.size.width;
-    CGFloat lineWidth = 1 + (0.01 * maxSize);
-    CGPoint circleCenter = CGPointMake(self.bounds.size.width / 2, self.bounds.size.height / 2);
-    CGFloat circleRadius = (maxSize - lineWidth) / 2.1;
-
-    CGContextSetFillColorWithColor(ctx, _foreColor);
-    CGContextSetStrokeColorWithColor(ctx, _foreColor);
-    CGContextSetLineWidth(ctx, lineWidth);
-
-    CGContextBeginPath(ctx);
-    CGContextMoveToPoint(ctx, circleCenter.x + circleRadius, circleCenter.y);
-    CGContextAddEllipseInRect(ctx, CGRectMake(circleCenter.x-circleRadius, circleCenter.y-circleRadius, 2*circleRadius, 2*circleRadius));
-    CGContextClosePath(ctx);
-    CGContextStrokePath(ctx);
-
-    if (_doubleValue > 0) {
-        CGFloat pieRadius = circleRadius - 2 * lineWidth;
-        
-        CGContextBeginPath(ctx);
-        CGContextMoveToPoint(ctx, circleCenter.x, circleCenter.y);
-        CGContextAddLineToPoint(ctx, circleCenter.x, circleCenter.y+pieRadius);
-        CGContextAddArc(ctx, circleCenter.x, circleCenter.y, pieRadius, M_PI_2, M_PI_2 - (2*M_PI*(_doubleValue/_maxValue)), 1);
-        CGContextClosePath(ctx);
-        CGContextFillPath(ctx);
-    }
-}
-#endif
-
-//------------------------------------------------------------------------------
-#pragma mark -
 #pragma mark Properties and Accessors
 //------------------------------------------------------------------------------
 
@@ -249,10 +199,8 @@ typedef struct _YRKPieGeometry {
         fin.backgroundColor = cgColor;
     }
     
-#if !TRADITIONAL_DETERMINATE
     _pieOutline.strokeColor = cgColor;
     _pieChartShape.strokeColor = cgColor;
-#endif
     
     [CATransaction commit];
 }
@@ -267,11 +215,6 @@ typedef struct _YRKPieGeometry {
 - (void)setIsDeterminate:(BOOL)determinate {
     _isDeterminate = determinate;
     [self setupType];
-#if TRADITIONAL_DETERMINATE
-    [self setNeedsDisplay];
-#else
-    
-#endif
 }
 
 - (double)doubleValue {
@@ -280,9 +223,7 @@ typedef struct _YRKPieGeometry {
 
 - (void)setDoubleValue:(double)doubleValue {
     _doubleValue = doubleValue;
-#if TRADITIONAL_DETERMINATE
-    [self setNeedsDisplay];
-#else
+    
     if (!isnan(_determinateTweenTime)) {
         [CATransaction begin];
         
@@ -295,7 +236,6 @@ typedef struct _YRKPieGeometry {
     if (!isnan(_determinateTweenTime)) {
         [CATransaction commit];
     }
-#endif
 }
 
 - (void)toggleProgressAnimation
@@ -322,20 +262,16 @@ typedef struct _YRKPieGeometry {
 }
 
 - (void)setupIndeterminate {
-#if !TRADITIONAL_DETERMINATE
     [_pieLayersRoot removeFromSuperlayer];
     [self addSublayer:_finLayersRoot];
-#endif
 
 }
 
 - (void)setupDeterminate {
     [self stopProgressAnimation];
     
-#if !TRADITIONAL_DETERMINATE
     [_finLayersRoot removeFromSuperlayer];
     [self addSublayer:_pieLayersRoot];
-#endif
 
 }
 
@@ -461,7 +397,6 @@ typedef struct _YRKPieGeometry {
     [_finLayers removeAllObjects];
 }
 
-#if !TRADITIONAL_DETERMINATE
 // These are proportional to the size of the drawn determinate progress indicator.
 const CGFloat OutlineWidthPercentage = 1.0/16;
 const CGFloat PieChartPaddingPercentage = OutlineWidthPercentage/2; // The padding around the pie chart.
@@ -607,7 +542,6 @@ static CGAffineTransform CGAffineTransformForScalingRectAroundCenter(CGRect rect
 	
 	return transform;
 }
-#endif
 
 
 static YRKFinGeometry finGeometryForBounds(CGRect bounds) {
