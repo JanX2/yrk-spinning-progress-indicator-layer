@@ -40,9 +40,6 @@ typedef struct _YRKPieGeometry {
 
 
 @implementation YRKSpinningProgressIndicatorLayer {
-    NSTimer *_animationTimer;
-    NSUInteger _position;
-    
     CALayer *_finLayersRoot;
     NSMutableArray *_finLayers;
     NSMutableArray *_finLayerRotationValues;
@@ -72,7 +69,6 @@ typedef struct _YRKPieGeometry {
     if (self) {
         _indeterminateCycleDuration = indeterminateCycleDuration;
         
-        _position = 0;
         _numFins = 12;
         _finLayers = [[NSMutableArray alloc] initWithCapacity:_numFins];
 
@@ -155,7 +151,6 @@ typedef struct _YRKPieGeometry {
 - (void)startProgressAnimation
 {
     _isRunning = YES;
-    _position = _numFins - 1;
     
     [self addSublayer:_finLayersRoot];
     
