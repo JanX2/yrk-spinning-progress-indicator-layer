@@ -43,7 +43,19 @@
 
     YRKSpinningProgressIndicatorLayer *progressIndicatorLayer = _mainView.progressIndicatorLayer;
 
+#if 1
     progressIndicatorLayer.determinateProgressOpacity = 0.70f;
+#else
+    progressIndicatorLayer.determinateProgressOpacity = 0.60f;
+    
+    progressIndicatorLayer.resizeShadows = YES;
+    progressIndicatorLayer.shadowColor = [NSColor blackColor].CGColor;
+    // These values are relative to the reference size set below.
+    progressIndicatorLayer.shadowRadius = 1.0;
+    progressIndicatorLayer.shadowOffset = CGSizeMake(1.0, -1.0);
+    progressIndicatorLayer.shadowOpacity = 0.75f;
+    progressIndicatorLayer.referenceSizeForShadowResizing = CGSizeMake(300.0, 300.0);
+#endif
     
     [self startStopProgressIndicator:self];
 }

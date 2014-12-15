@@ -49,6 +49,10 @@ typedef struct _YRKPieGeometry {
     CALayer *_pieLayersRoot;
     CAShapeLayer *_pieOutline;
     CAShapeLayer *_pieChartShape;
+    
+    CGSize _referenceSizeForShadowResizing;
+    CGFloat _initialShadowRadius;
+    CGSize _initialShadowOffset;
 }
 
 //------------------------------------------------------------------------------
@@ -82,6 +86,7 @@ typedef struct _YRKPieGeometry {
         _indeterminateMinimumOpacity = 0.05f;
         _isRunning = NO;
         self.color = [NSColor blackColor];
+        _resizeShadows = NO;
         [self setBounds:CGRectMake(0.0f, 0.0f, 10.0f, 10.0f)];
         self.isDeterminate = NO;
         _determinateTweenTime = determinateTweenTime;
@@ -92,6 +97,8 @@ typedef struct _YRKPieGeometry {
         
         _pieLayersRoot = [CALayer layer];
         [self createDeterminateLayers];
+        
+        self.referenceSizeForShadowResizing = CGSizeMake(100.0, 100.0);
     }
     return self;
 }
@@ -139,9 +146,27 @@ typedef struct _YRKPieGeometry {
     updatePieOutlineDimensionsForGeometry(_pieOutline, pieGeo);
     updatePieChartDimensionsForGeometry(_pieChartShape, pieGeo);
     
+    [self updateShadowDimensions];
+    
     [CATransaction commit];
 }
 
+- (void)updateShadowDimensions
+{
+    if (_resizeShadows) {
+        CGSize scaleFactors = [self shadowScaleFactorsForBounds:self.bounds];
+        CGFloat scaleFactor = shorterDimensionForSize(scaleFactors);
+        
+        CGSize scaledShadowOffset = _initialShadowOffset;
+        scaledShadowOffset.width *= scaleFactor;
+        scaledShadowOffset.height *= scaleFactor;
+        
+        self.shadowRadius = _initialShadowRadius * scaleFactor;
+        self.shadowOffset = scaledShadowOffset;
+        
+        // We could resize the sublayers’ shadows here.
+    }
+}
 
 //------------------------------------------------------------------------------
 #pragma mark -
@@ -198,6 +223,20 @@ typedef struct _YRKPieGeometry {
     _pieChartShape.strokeColor = cgColor;
     
     [CATransaction commit];
+}
+
+- (CGSize)referenceSizeForShadowResizing
+{
+    return _referenceSizeForShadowResizing;
+}
+
+- (void)setReferenceSizeForShadowResizing:(CGSize)newReferenceSize
+{
+    _referenceSizeForShadowResizing = newReferenceSize;
+    _initialShadowRadius = self.shadowRadius;
+    _initialShadowOffset = self.shadowOffset;
+    
+    [self updateShadowDimensions];
 }
 
 // Can't use @synthesize because we need the custom setters and atomic properties
@@ -276,6 +315,18 @@ typedef struct _YRKPieGeometry {
     [_finLayersRoot removeFromSuperlayer];
     [self addSublayer:_pieLayersRoot];
 
+}
+
+- (CGSize)shadowScaleFactorsForBounds:(CGRect)newBounds
+{
+    const CGSize initialSize = _referenceSizeForShadowResizing;
+    
+    CGSize scaleFactors = newBounds.size;
+    
+    scaleFactors.width /= initialSize.width;
+    scaleFactors.height /= initialSize.height;
+    
+    return scaleFactors;
 }
 
 - (void)createFinLayers

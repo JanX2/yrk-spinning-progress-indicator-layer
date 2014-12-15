@@ -32,6 +32,8 @@
 @property (readwrite, assign) BOOL isDeterminate;
 
 @property (readwrite, copy) NSColor *color;  // "copy" because we don't retain it -- we create a CGColor from it
+@property (readwrite, assign) BOOL resizeShadows;
+@property (readwrite, assign) CGSize referenceSizeForShadowResizing;
 
 // For determinate-mode only.
 @property (readwrite, assign) double maxValue;
