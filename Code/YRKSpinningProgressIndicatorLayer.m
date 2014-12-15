@@ -131,7 +131,7 @@ typedef struct _YRKPieGeometry {
     }
     
     // Scale pie.
-    YRKPieGeometry pieGeo = pieGeometryForBounds(self.bounds);
+    YRKPieGeometry pieGeo = pieGeometryForBounds(bounds);
     
     _pieLayersRoot.bounds = pieGeo.bounds;
     _pieLayersRoot.position = yrkCGRectGetCenter(pieGeo.bounds);
